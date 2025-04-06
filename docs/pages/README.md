@@ -1,8 +1,23 @@
 ---
 description: Список и описание всех сервисов приложения
+layout:
+  title:
+    visible: true
+  description:
+    visible: true
+  tableOfContents:
+    visible: true
+  outline:
+    visible: true
+  pagination:
+    visible: true
 ---
 
-# Сервисы
+# ✨ Сервисы
+
+{% embed url="https://miro.com/app/live-embed/uXjVIGwkThs=/?embedId=486326166974&moveToViewport=-481,-240,881,598" %}
+Структура сервисов
+{% endembed %}
 
 <details>
 

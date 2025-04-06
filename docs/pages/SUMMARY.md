@@ -1,3 +1,3 @@
 # Table of contents
 
-* [Сервисы](README.md)
+* [✨ Сервисы](README.md)
