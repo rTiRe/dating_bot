@@ -1,0 +1,48 @@
+services:
+  accounts_db:
+    image: 'postgres:15.5'
+    container_name: accounts_db
+    environment:
+      - POSTGRES_DB=${ACCOUNTS_DB_NAME}
+      - POSTGRES_USER=${ACCOUNTS_DB_USER}
+      - POSTGRES_PASSWORD=${ACCOUNTS_DB_PASS}
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:5442:5432
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-d", "${ACCOUNTS_DB_NAME}", "-U", "${ACCOUNTS_DB_USER}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    volumes:
+      - ./accounts_db/migrations:/app/migrations
+      - accounts_pgdata:/var/lib/postgresql/data
+    networks:
+      - accounts_network
+
+  accounts_service:
+    build: ./accounts_service
+    container_name: accounts_service
+    command: bash -c "poetry run yoyo apply -b && poetry run python -m src"
+    stop_signal: SIGINT
+    restart: no
+    depends_on:
+      accounts_db:
+        condition: service_healthy
+    env_file:
+      - accounts_service/config/.env
+    volumes:
+      - ./accounts_service:/usr/src/dating/accounts_service
+    networks:
+      - accounts_network
+      - external_network
+
+networks:
+  accounts_network:
+    driver: bridge
+  external_network:
+    driver: bridge
+
+volumes:
+  accounts_pgdata:
