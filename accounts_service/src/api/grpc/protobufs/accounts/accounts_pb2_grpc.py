@@ -54,6 +54,11 @@ class AccountsServiceStub(object):
                 request_serializer=accounts__pb2.AccountsDeleteRequest.SerializeToString,
                 response_deserializer=accounts__pb2.AccountsDeleteResponse.FromString,
                 _registered_method=True)
+        self.GetOrCreate = channel.unary_unary(
+                '/dating.service.accounts.AccountsService/GetOrCreate',
+                request_serializer=accounts__pb2.AccountsCreateRequest.SerializeToString,
+                response_deserializer=accounts__pb2.AccountsGetResponse.FromString,
+                _registered_method=True)
 
 
 class AccountsServiceServicer(object):
@@ -83,6 +88,12 @@ class AccountsServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetOrCreate(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_AccountsServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -105,6 +116,11 @@ def add_AccountsServiceServicer_to_server(servicer, server):
                     servicer.Delete,
                     request_deserializer=accounts__pb2.AccountsDeleteRequest.FromString,
                     response_serializer=accounts__pb2.AccountsDeleteResponse.SerializeToString,
+            ),
+            'GetOrCreate': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetOrCreate,
+                    request_deserializer=accounts__pb2.AccountsCreateRequest.FromString,
+                    response_serializer=accounts__pb2.AccountsGetResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -215,6 +231,33 @@ class AccountsService(object):
             '/dating.service.accounts.AccountsService/Delete',
             accounts__pb2.AccountsDeleteRequest.SerializeToString,
             accounts__pb2.AccountsDeleteResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetOrCreate(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/dating.service.accounts.AccountsService/GetOrCreate',
+            accounts__pb2.AccountsCreateRequest.SerializeToString,
+            accounts__pb2.AccountsGetResponse.FromString,
             options,
             channel_credentials,
             insecure,
