@@ -34,17 +34,50 @@ class AccountsServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
+        self.Create = channel.unary_unary(
+                '/dating.service.accounts.AccountsService/Create',
+                request_serializer=accounts__pb2.AccountsCreateRequest.SerializeToString,
+                response_deserializer=accounts__pb2.AccountsCreateResponse.FromString,
+                _registered_method=True)
         self.Get = channel.unary_unary(
                 '/dating.service.accounts.AccountsService/Get',
                 request_serializer=accounts__pb2.AccountsGetRequest.SerializeToString,
                 response_deserializer=accounts__pb2.AccountsGetResponse.FromString,
+                _registered_method=True)
+        self.Update = channel.unary_unary(
+                '/dating.service.accounts.AccountsService/Update',
+                request_serializer=accounts__pb2.AccountsUpdateRequest.SerializeToString,
+                response_deserializer=accounts__pb2.AccountsUpdateResponse.FromString,
+                _registered_method=True)
+        self.Delete = channel.unary_unary(
+                '/dating.service.accounts.AccountsService/Delete',
+                request_serializer=accounts__pb2.AccountsDeleteRequest.SerializeToString,
+                response_deserializer=accounts__pb2.AccountsDeleteResponse.FromString,
                 _registered_method=True)
 
 
 class AccountsServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
+    def Create(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def Get(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def Update(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def Delete(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -53,10 +86,25 @@ class AccountsServiceServicer(object):
 
 def add_AccountsServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
+            'Create': grpc.unary_unary_rpc_method_handler(
+                    servicer.Create,
+                    request_deserializer=accounts__pb2.AccountsCreateRequest.FromString,
+                    response_serializer=accounts__pb2.AccountsCreateResponse.SerializeToString,
+            ),
             'Get': grpc.unary_unary_rpc_method_handler(
                     servicer.Get,
                     request_deserializer=accounts__pb2.AccountsGetRequest.FromString,
                     response_serializer=accounts__pb2.AccountsGetResponse.SerializeToString,
+            ),
+            'Update': grpc.unary_unary_rpc_method_handler(
+                    servicer.Update,
+                    request_deserializer=accounts__pb2.AccountsUpdateRequest.FromString,
+                    response_serializer=accounts__pb2.AccountsUpdateResponse.SerializeToString,
+            ),
+            'Delete': grpc.unary_unary_rpc_method_handler(
+                    servicer.Delete,
+                    request_deserializer=accounts__pb2.AccountsDeleteRequest.FromString,
+                    response_serializer=accounts__pb2.AccountsDeleteResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -68,6 +116,33 @@ def add_AccountsServiceServicer_to_server(servicer, server):
  # This class is part of an EXPERIMENTAL API.
 class AccountsService(object):
     """Missing associated documentation comment in .proto file."""
+
+    @staticmethod
+    def Create(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/dating.service.accounts.AccountsService/Create',
+            accounts__pb2.AccountsCreateRequest.SerializeToString,
+            accounts__pb2.AccountsCreateResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
 
     @staticmethod
     def Get(request,
@@ -86,6 +161,60 @@ class AccountsService(object):
             '/dating.service.accounts.AccountsService/Get',
             accounts__pb2.AccountsGetRequest.SerializeToString,
             accounts__pb2.AccountsGetResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def Update(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/dating.service.accounts.AccountsService/Update',
+            accounts__pb2.AccountsUpdateRequest.SerializeToString,
+            accounts__pb2.AccountsUpdateResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def Delete(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/dating.service.accounts.AccountsService/Delete',
+            accounts__pb2.AccountsDeleteRequest.SerializeToString,
+            accounts__pb2.AccountsDeleteResponse.FromString,
             options,
             channel_credentials,
             insecure,
