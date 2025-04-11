@@ -129,15 +129,20 @@ class AccountsService(accounts_pb2_grpc.AccountsServiceServicer):
             await context.abort(grpc.StatusCode.INVALID_ARGUMENT, 'Empty update data')
         for name, value in update_data.items():
             try:
-                await self.name_to_checker['name'](value)
+                await self.name_to_checker[name](value)
             except ValueError as exception:
                 await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
+        specification = EqualsSpecification('id', request.id)
+        data = UpdateAccountSchema(**update_data)
         async with database.pool.acquire() as connection:
-            update_result = await AccountRepository.update(
-                connection,
-                EqualsSpecification('id', request.id),
-                data=UpdateAccountSchema(**update_data),
-            )
+            try:
+                update_result = await AccountRepository.update(connection, specification, data=data)
+            except UniqueViolationError as exception:
+                logger.error(exception)
+                await context.abort(
+                    grpc.StatusCode.ALREADY_EXISTS,
+                    'An account with this telegram_id field already exists',
+                )
         return accounts_pb2.AccountsUpdateResponse(result=update_result)
 
     async def Delete(
