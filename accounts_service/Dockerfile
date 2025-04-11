@@ -1,4 +1,4 @@
-FROM python:3.12
+FROM python:3.12-alpine
 
 RUN mkdir -p /usr/src/dating/accounts_service
 WORKDIR /usr/src/dating/accounts_service
