@@ -4,16 +4,16 @@ package dating.service.accounts;
 
 
 service AccountsService{
-    rpc Get(GetRequest) returns (GetResponse);
+    rpc Get(AccountsGetRequest) returns (AccountsGetResponse);
 }
 
 
-message GetRequest {
+message AccountsGetRequest {
     int64 telegram_id = 1;
     string telegram_username = 2;
 }
 
-message GetResponse {
+message AccountsGetResponse {
     string id = 1;
     int64 telegram_id = 2;
     string telegram_username = 3;
