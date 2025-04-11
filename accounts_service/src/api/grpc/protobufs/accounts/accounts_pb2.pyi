@@ -4,7 +4,7 @@ from typing import ClassVar as _ClassVar, Optional as _Optional
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
-class GetRequest(_message.Message):
+class AccountsGetRequest(_message.Message):
     __slots__ = ("telegram_id", "telegram_username")
     TELEGRAM_ID_FIELD_NUMBER: _ClassVar[int]
     TELEGRAM_USERNAME_FIELD_NUMBER: _ClassVar[int]
@@ -12,7 +12,7 @@ class GetRequest(_message.Message):
     telegram_username: str
     def __init__(self, telegram_id: _Optional[int] = ..., telegram_username: _Optional[str] = ...) -> None: ...
 
-class GetResponse(_message.Message):
+class AccountsGetResponse(_message.Message):
     __slots__ = ("id", "telegram_id", "telegram_username", "created_at", "updated_at")
     ID_FIELD_NUMBER: _ClassVar[int]
     TELEGRAM_ID_FIELD_NUMBER: _ClassVar[int]

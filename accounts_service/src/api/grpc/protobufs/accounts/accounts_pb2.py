@@ -24,17 +24,17 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0e\x61\x63\x63ounts.proto\x12\x17\x64\x61ting.service.accounts\"<\n\nGetRequest\x12\x13\n\x0btelegram_id\x18\x01 \x01(\x03\x12\x19\n\x11telegram_username\x18\x02 \x01(\t\"q\n\x0bGetResponse\x12\n\n\x02id\x18\x01 \x01(\t\x12\x13\n\x0btelegram_id\x18\x02 \x01(\x03\x12\x19\n\x11telegram_username\x18\x03 \x01(\t\x12\x12\n\ncreated_at\x18\x04 \x01(\t\x12\x12\n\nupdated_at\x18\x05 \x01(\t2c\n\x0f\x41\x63\x63ountsService\x12P\n\x03Get\x12#.dating.service.accounts.GetRequest\x1a$.dating.service.accounts.GetResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0e\x61\x63\x63ounts.proto\x12\x17\x64\x61ting.service.accounts\"D\n\x12\x41\x63\x63ountsGetRequest\x12\x13\n\x0btelegram_id\x18\x01 \x01(\x03\x12\x19\n\x11telegram_username\x18\x02 \x01(\t\"y\n\x13\x41\x63\x63ountsGetResponse\x12\n\n\x02id\x18\x01 \x01(\t\x12\x13\n\x0btelegram_id\x18\x02 \x01(\x03\x12\x19\n\x11telegram_username\x18\x03 \x01(\t\x12\x12\n\ncreated_at\x18\x04 \x01(\t\x12\x12\n\nupdated_at\x18\x05 \x01(\t2s\n\x0f\x41\x63\x63ountsService\x12`\n\x03Get\x12+.dating.service.accounts.AccountsGetRequest\x1a,.dating.service.accounts.AccountsGetResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'accounts_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_GETREQUEST']._serialized_start=43
-  _globals['_GETREQUEST']._serialized_end=103
-  _globals['_GETRESPONSE']._serialized_start=105
-  _globals['_GETRESPONSE']._serialized_end=218
-  _globals['_ACCOUNTSSERVICE']._serialized_start=220
-  _globals['_ACCOUNTSSERVICE']._serialized_end=319
+  _globals['_ACCOUNTSGETREQUEST']._serialized_start=43
+  _globals['_ACCOUNTSGETREQUEST']._serialized_end=111
+  _globals['_ACCOUNTSGETRESPONSE']._serialized_start=113
+  _globals['_ACCOUNTSGETRESPONSE']._serialized_end=234
+  _globals['_ACCOUNTSSERVICE']._serialized_start=236
+  _globals['_ACCOUNTSSERVICE']._serialized_end=351
 # @@protoc_insertion_point(module_scope)
