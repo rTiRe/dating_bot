@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0e\x61\x63\x63ounts.proto\x12\x17\x64\x61ting.service.accounts\"G\n\x15\x41\x63\x63ountsCreateRequest\x12\x13\n\x0btelegram_id\x18\x01 \x01(\x03\x12\x19\n\x11telegram_username\x18\x02 \x01(\t\"}\n\x12\x41\x63\x63ountsGetRequest\x12\x0c\n\x02id\x18\x01 \x01(\tH\x00\x12\x15\n\x0btelegram_id\x18\x02 \x01(\x03H\x00\x12\x1e\n\x11telegram_username\x18\x03 \x01(\tH\x01\x88\x01\x01\x42\x0c\n\nidentifierB\x14\n\x12_telegram_username\"\xda\x01\n\x15\x41\x63\x63ountsUpdateRequest\x12\n\n\x02id\x18\x01 \x01(\t\x12G\n\x04\x64\x61ta\x18\x02 \x01(\x0b\x32\x39.dating.service.accounts.AccountsUpdateRequest.UpdateData\x1al\n\nUpdateData\x12\x18\n\x0btelegram_id\x18\x01 \x01(\x03H\x00\x88\x01\x01\x12\x1e\n\x11telegram_username\x18\x02 \x01(\tH\x01\x88\x01\x01\x42\x0e\n\x0c_telegram_idB\x14\n\x12_telegram_username\"#\n\x15\x41\x63\x63ountsDeleteRequest\x12\n\n\x02id\x18\x01 \x01(\t\"|\n\x16\x41\x63\x63ountsCreateResponse\x12\n\n\x02id\x18\x01 \x01(\t\x12\x13\n\x0btelegram_id\x18\x02 \x01(\x03\x12\x19\n\x11telegram_username\x18\x03 \x01(\t\x12\x12\n\ncreated_at\x18\x04 \x01(\t\x12\x12\n\nupdated_at\x18\x05 \x01(\t\"y\n\x13\x41\x63\x63ountsGetResponse\x12\n\n\x02id\x18\x01 \x01(\t\x12\x13\n\x0btelegram_id\x18\x02 \x01(\x03\x12\x19\n\x11telegram_username\x18\x03 \x01(\t\x12\x12\n\ncreated_at\x18\x04 \x01(\t\x12\x12\n\nupdated_at\x18\x05 \x01(\t\"(\n\x16\x41\x63\x63ountsUpdateResponse\x12\x0e\n\x06result\x18\x01 \x01(\t\"(\n\x16\x41\x63\x63ountsDeleteResponse\x12\x0e\n\x06result\x18\x01 \x01(\t2\xb4\x03\n\x0f\x41\x63\x63ountsService\x12i\n\x06\x43reate\x12..dating.service.accounts.AccountsCreateRequest\x1a/.dating.service.accounts.AccountsCreateResponse\x12`\n\x03Get\x12+.dating.service.accounts.AccountsGetRequest\x1a,.dating.service.accounts.AccountsGetResponse\x12i\n\x06Update\x12..dating.service.accounts.AccountsUpdateRequest\x1a/.dating.service.accounts.AccountsUpdateResponse\x12i\n\x06\x44\x65lete\x12..dating.service.accounts.AccountsDeleteRequest\x1a/.dating.service.accounts.AccountsDeleteResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0e\x61\x63\x63ounts.proto\x12\x17\x64\x61ting.service.accounts\"b\n\x15\x41\x63\x63ountsCreateRequest\x12\x13\n\x0btelegram_id\x18\x01 \x01(\x03\x12\x1e\n\x11telegram_username\x18\x02 \x01(\tH\x00\x88\x01\x01\x42\x14\n\x12_telegram_username\"}\n\x12\x41\x63\x63ountsGetRequest\x12\x0c\n\x02id\x18\x01 \x01(\tH\x00\x12\x15\n\x0btelegram_id\x18\x02 \x01(\x03H\x00\x12\x1e\n\x11telegram_username\x18\x03 \x01(\tH\x01\x88\x01\x01\x42\x0c\n\nidentifierB\x14\n\x12_telegram_username\"\xda\x01\n\x15\x41\x63\x63ountsUpdateRequest\x12\n\n\x02id\x18\x01 \x01(\t\x12G\n\x04\x64\x61ta\x18\x02 \x01(\x0b\x32\x39.dating.service.accounts.AccountsUpdateRequest.UpdateData\x1al\n\nUpdateData\x12\x18\n\x0btelegram_id\x18\x01 \x01(\x03H\x00\x88\x01\x01\x12\x1e\n\x11telegram_username\x18\x02 \x01(\tH\x01\x88\x01\x01\x42\x0e\n\x0c_telegram_idB\x14\n\x12_telegram_username\"#\n\x15\x41\x63\x63ountsDeleteRequest\x12\n\n\x02id\x18\x01 \x01(\t\"|\n\x16\x41\x63\x63ountsCreateResponse\x12\n\n\x02id\x18\x01 \x01(\t\x12\x13\n\x0btelegram_id\x18\x02 \x01(\x03\x12\x19\n\x11telegram_username\x18\x03 \x01(\t\x12\x12\n\ncreated_at\x18\x04 \x01(\t\x12\x12\n\nupdated_at\x18\x05 \x01(\t\"y\n\x13\x41\x63\x63ountsGetResponse\x12\n\n\x02id\x18\x01 \x01(\t\x12\x13\n\x0btelegram_id\x18\x02 \x01(\x03\x12\x19\n\x11telegram_username\x18\x03 \x01(\t\x12\x12\n\ncreated_at\x18\x04 \x01(\t\x12\x12\n\nupdated_at\x18\x05 \x01(\t\"(\n\x16\x41\x63\x63ountsUpdateResponse\x12\x0e\n\x06result\x18\x01 \x01(\t\"(\n\x16\x41\x63\x63ountsDeleteResponse\x12\x0e\n\x06result\x18\x01 \x01(\t2\xa1\x04\n\x0f\x41\x63\x63ountsService\x12i\n\x06\x43reate\x12..dating.service.accounts.AccountsCreateRequest\x1a/.dating.service.accounts.AccountsCreateResponse\x12`\n\x03Get\x12+.dating.service.accounts.AccountsGetRequest\x1a,.dating.service.accounts.AccountsGetResponse\x12i\n\x06Update\x12..dating.service.accounts.AccountsUpdateRequest\x1a/.dating.service.accounts.AccountsUpdateResponse\x12i\n\x06\x44\x65lete\x12..dating.service.accounts.AccountsDeleteRequest\x1a/.dating.service.accounts.AccountsDeleteResponse\x12k\n\x0bGetOrCreate\x12..dating.service.accounts.AccountsCreateRequest\x1a,.dating.service.accounts.AccountsGetResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,23 +32,23 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'accounts_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
   _globals['_ACCOUNTSCREATEREQUEST']._serialized_start=43
-  _globals['_ACCOUNTSCREATEREQUEST']._serialized_end=114
-  _globals['_ACCOUNTSGETREQUEST']._serialized_start=116
-  _globals['_ACCOUNTSGETREQUEST']._serialized_end=241
-  _globals['_ACCOUNTSUPDATEREQUEST']._serialized_start=244
-  _globals['_ACCOUNTSUPDATEREQUEST']._serialized_end=462
-  _globals['_ACCOUNTSUPDATEREQUEST_UPDATEDATA']._serialized_start=354
-  _globals['_ACCOUNTSUPDATEREQUEST_UPDATEDATA']._serialized_end=462
-  _globals['_ACCOUNTSDELETEREQUEST']._serialized_start=464
-  _globals['_ACCOUNTSDELETEREQUEST']._serialized_end=499
-  _globals['_ACCOUNTSCREATERESPONSE']._serialized_start=501
-  _globals['_ACCOUNTSCREATERESPONSE']._serialized_end=625
-  _globals['_ACCOUNTSGETRESPONSE']._serialized_start=627
-  _globals['_ACCOUNTSGETRESPONSE']._serialized_end=748
-  _globals['_ACCOUNTSUPDATERESPONSE']._serialized_start=750
-  _globals['_ACCOUNTSUPDATERESPONSE']._serialized_end=790
-  _globals['_ACCOUNTSDELETERESPONSE']._serialized_start=792
-  _globals['_ACCOUNTSDELETERESPONSE']._serialized_end=832
-  _globals['_ACCOUNTSSERVICE']._serialized_start=835
-  _globals['_ACCOUNTSSERVICE']._serialized_end=1271
+  _globals['_ACCOUNTSCREATEREQUEST']._serialized_end=141
+  _globals['_ACCOUNTSGETREQUEST']._serialized_start=143
+  _globals['_ACCOUNTSGETREQUEST']._serialized_end=268
+  _globals['_ACCOUNTSUPDATEREQUEST']._serialized_start=271
+  _globals['_ACCOUNTSUPDATEREQUEST']._serialized_end=489
+  _globals['_ACCOUNTSUPDATEREQUEST_UPDATEDATA']._serialized_start=381
+  _globals['_ACCOUNTSUPDATEREQUEST_UPDATEDATA']._serialized_end=489
+  _globals['_ACCOUNTSDELETEREQUEST']._serialized_start=491
+  _globals['_ACCOUNTSDELETEREQUEST']._serialized_end=526
+  _globals['_ACCOUNTSCREATERESPONSE']._serialized_start=528
+  _globals['_ACCOUNTSCREATERESPONSE']._serialized_end=652
+  _globals['_ACCOUNTSGETRESPONSE']._serialized_start=654
+  _globals['_ACCOUNTSGETRESPONSE']._serialized_end=775
+  _globals['_ACCOUNTSUPDATERESPONSE']._serialized_start=777
+  _globals['_ACCOUNTSUPDATERESPONSE']._serialized_end=817
+  _globals['_ACCOUNTSDELETERESPONSE']._serialized_start=819
+  _globals['_ACCOUNTSDELETERESPONSE']._serialized_end=859
+  _globals['_ACCOUNTSSERVICE']._serialized_start=862
+  _globals['_ACCOUNTSSERVICE']._serialized_end=1407
 # @@protoc_insertion_point(module_scope)

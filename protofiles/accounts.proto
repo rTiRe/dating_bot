@@ -8,12 +8,13 @@ service AccountsService{
     rpc Get(AccountsGetRequest) returns (AccountsGetResponse);
     rpc Update(AccountsUpdateRequest) returns (AccountsUpdateResponse);
     rpc Delete(AccountsDeleteRequest) returns (AccountsDeleteResponse);
+    rpc GetOrCreate(AccountsCreateRequest) returns (AccountsGetResponse);
 }
 
 
 message AccountsCreateRequest {
     int64 telegram_id = 1;
-    string telegram_username = 2;
+    optional string telegram_username = 2;
 }
 
 message AccountsGetRequest {
