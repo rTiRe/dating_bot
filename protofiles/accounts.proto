@@ -4,13 +4,46 @@ package dating.service.accounts;
 
 
 service AccountsService{
+    rpc Create(AccountsCreateRequest) returns (AccountsCreateResponse);
     rpc Get(AccountsGetRequest) returns (AccountsGetResponse);
+    rpc Update(AccountsUpdateRequest) returns (AccountsUpdateResponse);
+    rpc Delete(AccountsDeleteRequest) returns (AccountsDeleteResponse);
 }
 
 
-message AccountsGetRequest {
+message AccountsCreateRequest {
     int64 telegram_id = 1;
     string telegram_username = 2;
+}
+
+message AccountsGetRequest {
+    oneof identifier {
+        string id = 1;
+        int64 telegram_id = 2;
+    }
+    optional string telegram_username = 3;
+}
+
+message AccountsUpdateRequest {
+    message UpdateData {
+        optional int64 telegram_id = 1;
+        optional string telegram_username = 2;
+    }
+    string id = 1;
+    UpdateData data = 2;
+}
+
+message AccountsDeleteRequest {
+    string id = 1;
+}
+
+
+message AccountsCreateResponse {
+    string id = 1;
+    int64 telegram_id = 2;
+    string telegram_username = 3;
+    string created_at = 4;
+    string updated_at = 5;
 }
 
 message AccountsGetResponse {
@@ -19,4 +52,12 @@ message AccountsGetResponse {
     string telegram_username = 3;
     string created_at = 4;
     string updated_at = 5;
+}
+
+message AccountsUpdateResponse {
+    string result = 1;
+}
+
+message AccountsDeleteResponse {
+    string result = 1;
 }

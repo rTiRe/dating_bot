@@ -107,7 +107,7 @@ class BaseRepository(ABC):
                 'If you are sure, set delete_all to True.'
             )
         statement_values = []
-        statement = f'delete {table_name}'
+        statement = f'delete from {table_name}'
         if specifications:
             statement, statement_values = await BaseRepository.add_conditions(
                 statement,
