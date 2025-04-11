@@ -1,7 +1,7 @@
 from src.api.grpc.connections.base import BaseConnection
 
 from src.api.grpc.protobufs.accounts.accounts_pb2_grpc import AccountsServiceStub
-from src.api.grpc.protobufs.accounts.accounts_pb2 import GetRequest, GetResponse
+from src.api.grpc.protobufs.accounts.accounts_pb2 import AccountsGetRequest, AccountsGetResponse
 from config import settings
 
 

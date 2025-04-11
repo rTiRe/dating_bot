@@ -36,8 +36,8 @@ class AccountsServiceStub(object):
         """
         self.Get = channel.unary_unary(
                 '/dating.service.accounts.AccountsService/Get',
-                request_serializer=accounts__pb2.GetRequest.SerializeToString,
-                response_deserializer=accounts__pb2.GetResponse.FromString,
+                request_serializer=accounts__pb2.AccountsGetRequest.SerializeToString,
+                response_deserializer=accounts__pb2.AccountsGetResponse.FromString,
                 _registered_method=True)
 
 
@@ -55,8 +55,8 @@ def add_AccountsServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'Get': grpc.unary_unary_rpc_method_handler(
                     servicer.Get,
-                    request_deserializer=accounts__pb2.GetRequest.FromString,
-                    response_serializer=accounts__pb2.GetResponse.SerializeToString,
+                    request_deserializer=accounts__pb2.AccountsGetRequest.FromString,
+                    response_serializer=accounts__pb2.AccountsGetResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -84,8 +84,8 @@ class AccountsService(object):
             request,
             target,
             '/dating.service.accounts.AccountsService/Get',
-            accounts__pb2.GetRequest.SerializeToString,
-            accounts__pb2.GetResponse.FromString,
+            accounts__pb2.AccountsGetRequest.SerializeToString,
+            accounts__pb2.AccountsGetResponse.FromString,
             options,
             channel_credentials,
             insecure,
