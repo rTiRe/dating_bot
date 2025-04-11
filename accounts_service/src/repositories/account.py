@@ -22,7 +22,7 @@ class AccountRepository(BaseRepository):
         *specifications: Specification,
         page: int = 1,
         page_size: int = 100,
-    ) -> AccountSchema:
+    ) -> list[AccountSchema]:
         return await super(__class__, __class__).get(
             connection,
             'dating.accounts',
