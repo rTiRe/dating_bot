@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package dating.service.accounts;
+
+
+service AccountsService{
+    rpc Get(GetRequest) returns (GetResponse);
+}
+
+
+message GetRequest {
+    int64 telegram_id = 1;
+    string telegram_username = 2;
+}
+
+message GetResponse {
+    string id = 1;
+    int64 telegram_id = 2;
+    string telegram_username = 3;
+    string created_at = 4;
+    string updated_at = 5;
+}
