@@ -1,16 +1,13 @@
+import asyncio
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
-from asyncpg.exceptions import UniqueViolationError
 import uvicorn
 from fastapi import FastAPI
 
 from config import logger
-from src.exceptions import DeleteAllRowsException
 from src.storage import database
-from src.specifications import EqualsSpecification
-from src.repositories import AccountRepository
-from src.schemas import CreateAccountSchema
+from src.api.grpc.services import AccountsService
 
 
 logger = logger(__name__)
@@ -19,19 +16,9 @@ logger = logger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     await database.connect()
-    async with database.pool.acquire() as connection:
-        try:
-            await AccountRepository.create(connection, CreateAccountSchema(telegram_id=1))
-        except UniqueViolationError as e:
-            logger.error(e)
-        logger.info(
-            await AccountRepository.get(connection, EqualsSpecification('telegram_id', 1)),
-        )
-        try:
-            await AccountRepository.delete(connection)
-        except DeleteAllRowsException as e:
-            logger.error(e)
+    grpc_task = asyncio.create_task(AccountsService.serve())
     yield
+    grpc_task.cancel()
     await database.disconnect()
 
 

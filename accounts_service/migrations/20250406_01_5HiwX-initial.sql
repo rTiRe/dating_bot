@@ -9,8 +9,8 @@ create table dating."accounts" (
     id uuid primary key default uuid_generate_v4(),
     telegram_id int8 not null unique,
     telegram_username varchar(32),
-    created_at timestamp default now(),
-    updated_at timestamp default now()
+    created_at timestampz default now(),
+    updated_at timestampz default now()
 );
 
 create or replace function update_updated_at_column()

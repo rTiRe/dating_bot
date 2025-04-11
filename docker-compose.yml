@@ -16,7 +16,6 @@ services:
       retries: 3
       start_period: 5s
     volumes:
-      - ./accounts_db/migrations:/app/migrations
       - accounts_pgdata:/var/lib/postgresql/data
     networks:
       - accounts_network
@@ -34,6 +33,9 @@ services:
       - accounts_service/config/.env
     volumes:
       - ./accounts_service:/usr/src/dating/accounts_service
+    ports:
+      - 8001:8001
+      - 8010:1337
     networks:
       - accounts_network
       - external_network

@@ -1,5 +1,3 @@
-from typing import Any
-
 from asyncpg.connection import Connection
 
 from src.schemas import AccountSchema, CreateAccountSchema, UpdateAccountSchema
