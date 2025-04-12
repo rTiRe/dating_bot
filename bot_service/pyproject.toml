@@ -1,0 +1,22 @@
+[project]
+name = "bot-service"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "rTiRe",email = "zientenin@mail.ru"}
+]
+readme = "README.md"
+requires-python = ">=3.12,<4.0"
+dependencies = [
+    "aiogram (>=3.19.0,<4.0.0)",
+    "pydantic-settings (>=2.8.1,<3.0.0)",
+    "aio-pika (>=9.5.5,<10.0.0)",
+    "grpcio-tools (>=1.71.0,<2.0.0)"
+]
+
+[tool.poetry]
+package-mode=false
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

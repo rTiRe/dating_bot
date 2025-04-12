@@ -30,7 +30,7 @@ services:
     ports:
       - 127.0.0.1:5442:5432
     healthcheck:
-      test: [ "CMD", "pg_isready", "-d", "${ACCOUNTS_DB_NAME}", "-U", "${ACCOUNTS_DB_USER}" ]
+      test: [ "CMD", "pg_isready", "-d", "test", "-U", "${ACCOUNTS_DB_USER}" ]
       interval: 5s
       timeout: 5s
       retries: 3
@@ -60,8 +60,27 @@ services:
       - accounts_network
       - external_network
 
+  bot_service:
+    build: ./bot_service
+    container_name: bot_service
+    command: ash -c "poetry run python -m src"
+    stop_signal: SIGINT
+    restart: unless-stopped
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    env_file:
+      - bot_service/config/.env
+    volumes:
+      - ./bot_service:/usr/src/dating/bot_service
+    networks:
+      - bot_network
+      - external_network
+
 networks:
   accounts_network:
+    driver: bridge
+  bot_network:
     driver: bridge
   external_network:
     driver: bridge
