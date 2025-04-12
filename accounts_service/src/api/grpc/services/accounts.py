@@ -4,7 +4,7 @@ from asyncpg.exceptions import UniqueViolationError
 import grpc
 
 from config import logger
-from src.api.grpc.protobufs.accounts import accounts_pb2, accounts_pb2_grpc
+from src.api.grpc.protobufs import accounts_pb2, accounts_pb2_grpc
 from src.repositories import AccountRepository
 from src.specifications import EqualsSpecification
 from src.storage.postgres import database
