@@ -45,7 +45,7 @@ services:
     container_name: accounts_service
     command: ash -c "poetry run yoyo apply -b && poetry run python -m src"
     stop_signal: SIGINT
-    restart: no
+    restart: unless-stopped
     depends_on:
       accounts_db:
         condition: service_healthy
