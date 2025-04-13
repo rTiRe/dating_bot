@@ -1,8 +1,7 @@
-from src.specifications.base import Specification, AndSpecification, OrSpecification, NotSpecification
-from src.specifications.equals import EqualsSpecification, NotEqualsSpecification, InSpecification
-from src.specifications.greater import GreaterThanSpecification, GreaterEqualsSpecification
-from src.specifications.less import LessThanSpecification, LessEqualsSpecification
-
+from src.specifications.base import AndSpecification, NotSpecification, OrSpecification, Specification
+from src.specifications.equals import EqualsSpecification, InSpecification, NotEqualsSpecification
+from src.specifications.greater import GreaterEqualsSpecification, GreaterThanSpecification
+from src.specifications.less import LessEqualsSpecification, LessThanSpecification
 
 __all__ = [
     'AndSpecification',
