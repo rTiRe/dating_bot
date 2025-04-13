@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package dating.service.profiles;
+
+
+service ProfilesService {
+    rpc Get(ProfilesGetRequest) returns (ProfilesGetResponse);
+}
+
+
+message ProfilesGetRequest {
+    string user_id = 1;
+}
+
+
+message ProfilesGetResponse {
+    string id = 1;
+    string user_id = 2;
+    string first_name = 3;
+    string last_name = 4;
+    int32 age = 5;
+    Gender gender = 6;
+    string biography = 7;
+    string additional_info = 8;
+}
+
+
+enum Gender {
+    GENDER_MALE = 0;
+    GENDER_FEMALE = 1;
+}
