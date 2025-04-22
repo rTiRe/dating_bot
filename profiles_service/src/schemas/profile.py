@@ -4,10 +4,7 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-
-class GenderEnum(Enum):
-    GENDER_MALE = 0
-    GENDER_FEMALE = 1
+from src.api.grpc.protobufs.profiles.profiles_pb2 import Gender
 
 
 class ProfileSchema(BaseModel):
@@ -16,7 +13,7 @@ class ProfileSchema(BaseModel):
     first_name: str
     last_name: str
     age: int
-    gender: GenderEnum
+    gender: Gender
     biography: str | None = None
     additional_info: str | None = None
     created_at: datetime
@@ -28,7 +25,7 @@ class CreateProfileSchema(BaseModel):
     first_name: str
     last_name: str
     age: int
-    gender: GenderEnum
+    gender: Gender
     biography: str | None = None
     additional_info: str | None = None
 
@@ -38,6 +35,6 @@ class UpdateProfileSchema(BaseModel):
     first_name: str | None = None
     last_name: str | None = None
     age: int | None = None
-    gender: GenderEnum | None = None
+    gender: Gender | None = None
     biography: str | None = None
     additional_info: str | None = None
