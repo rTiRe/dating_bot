@@ -63,6 +63,13 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
                 'The length of the text field value must be from 0 to 256 characters',
             )
 
+    @staticmethod
+    async def __check_language(lang: str) -> None:
+        if not lang:
+            raise ValueError('The language field must be set')
+        if len(lang) > 2:
+            raise ValueError('The language code must conform to the ISO 639-1 format (two-character code)')
+
     name_to_checker = {
         'id': __check_id,
         'account_id': __check_id,
@@ -72,6 +79,7 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
         'gender': __check_gender,
         'biography': __check_text,
         'additional_info': __check_text,
+        'language': __check_language,
     }
 
 
@@ -93,6 +101,7 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             gender=request.gender,
             biography=request.biography,
             additional_info=request.additional_info,
+            language=request.language,
         )
         async with database.pool.acquire() as connection:
             try:
@@ -108,6 +117,7 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             gender=profile.gender,
             biography=profile.biography,
             additional_info=profile.additional_info,
+            language=request.language,
             created_at=profile.created_at.isoformat(),
             updated_at=profile.updated_at.isoformat(),
         )
@@ -134,24 +144,6 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             if len(profiles) == 0:
                 await context.abort(grpc.StatusCode.NOT_FOUND)
             profile = profiles[0]
-            is_biography_set = request.HasField('biography')
-            is_additional_info_set = request.HasField('additional_info')
-            if is_biography_set and profile.biography != request.biography:
-                try:
-                    await self.__check_text(request.biography)
-                except ValueError as exception:
-                    await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
-                update_data = UpdateProfileSchema(biography=request.biography)
-                await ProfilesRepository.update(connection, specification, update_data=update_data)
-                setattr(profile, 'biography', update_data.biography)
-            if is_additional_info_set and profile.additional_info != request.additional_info:
-                try:
-                    await self.__check_text(request.additional_info)
-                except ValueError as exception:
-                    await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
-                update_data = UpdateProfileSchema(biography=request.additional_info)
-                await ProfilesRepository.update(connection, specification, update_data=update_data)
-                setattr(profile, 'additional_info', update_data.additional_info)
         return profiles_pb2.ProfilesGetResponse(
             id=str(profile.id),
             account_id=str(profile.account_id),
@@ -161,6 +153,7 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             gender=profile.gender.value,
             biography=profile.biography,
             additional_info=profile.additional_info,
+            language=profile.language,
             created_at=profile.created_at.isoformat(),
             updated_at=profile.updated_at.isoformat(),
         )

@@ -1,5 +1,4 @@
 from datetime import datetime
-from enum import Enum
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -16,6 +15,7 @@ class ProfileSchema(BaseModel):
     gender: Gender
     biography: str | None = None
     additional_info: str | None = None
+    language: str
     created_at: datetime
     updated_at: datetime
 
@@ -28,6 +28,7 @@ class CreateProfileSchema(BaseModel):
     gender: Gender
     biography: str | None = None
     additional_info: str | None = None
+    language: str
 
 
 class UpdateProfileSchema(BaseModel):
@@ -38,3 +39,4 @@ class UpdateProfileSchema(BaseModel):
     gender: Gender | None = None
     biography: str | None = None
     additional_info: str | None = None
+    language: str
