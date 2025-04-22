@@ -3,6 +3,7 @@ from uuid import UUID
 import grpc
 from asyncpg import UniqueViolationError
 
+from config.logger import logger
 from src.api.grpc.protobufs.profiles import profiles_pb2, profiles_pb2_grpc
 from src.repositories.profiles import ProfilesRepository
 from src.schemas.profile import UpdateProfileSchema, CreateProfileSchema
@@ -81,7 +82,6 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
     ) -> profiles_pb2.ProfileCreateResponse:
         try:
             for name, field_value in request.__dict__.items():
-                if name == 'id': continue
                 await self.name_to_checker[name](field_value)
         except ValueError as exception:
             await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
@@ -164,3 +164,48 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             created_at=profile.created_at.isoformat(),
             updated_at=profile.updated_at.isoformat(),
         )
+
+    async def Update(
+        self,
+        request: profiles_pb2.ProfileUpdateRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> profiles_pb2.ProfilesUpdateResponse:
+        update_data = {descriptor.name: field_value for descriptor, field_value in request.data.ListFields()}
+        if not update_data:
+            await context.abort(grpc.StatusCode.INVALID_ARGUMENT, 'Empty update data')
+        for name, field_value in update_data.items():
+            try:  # noqa: WPS229
+                await self.__check_id(request.id)
+                await self.name_to_checker[name](field_value)
+            except ValueError as exception:
+                await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
+        specification = EqualsSpecification('id', request.id)
+        update_schema = UpdateProfileSchema(**update_data)
+        async with database.pool.acquire() as connection:
+            try:
+                update_result = await ProfilesRepository.update(
+                    connection,
+                    specification,
+                    update_data=update_schema,
+                )
+            except UniqueViolationError as exception:
+                logger.error(exception)
+                await context.abort(
+                    grpc.StatusCode.ALREADY_EXISTS,
+                    'An account with this telegram_id field already exists',
+                )
+        return profiles_pb2.ProfilesUpdateResponse(result=update_result)
+
+    async def Delete(
+        self,
+        request: profiles_pb2.ProfileDeleteRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> profiles_pb2.ProfilesDeleteResponse:
+        try:
+            await self.__check_id(request.id)
+        except ValueError as exception:
+            await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
+        delete_specification = EqualsSpecification('id', request.id)
+        async with database.pool.acquire() as connection:
+            delete_result = await ProfilesRepository.delete(connection, delete_specification)
+        return profiles_pb2.ProfilesDeleteResponse(result=delete_result)
