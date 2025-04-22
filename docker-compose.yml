@@ -1,4 +1,24 @@
 services:
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    restart: unless-stopped
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 3s
+      timeout: 10s
+      retries: 3
+    ports:
+      - 127.0.0.1:5672:5672
+      - 127.0.0.1:15672:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - external_network
+
   accounts_db:
     image: 'postgres:15.5'
     container_name: accounts_db
@@ -23,9 +43,9 @@ services:
   accounts_service:
     build: ./accounts_service
     container_name: accounts_service
-    command: bash -c "poetry run yoyo apply -b && poetry run python -m src"
+    command: ash -c "poetry run yoyo apply -b && poetry run python -m src"
     stop_signal: SIGINT
-    restart: no
+    restart: unless-stopped
     depends_on:
       accounts_db:
         condition: service_healthy
@@ -48,3 +68,4 @@ networks:
 
 volumes:
   accounts_pgdata:
+  rabbitmq_data:

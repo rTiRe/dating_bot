@@ -1,11 +1,13 @@
 from asyncpg.connection import Connection
 
 from src.schemas import AccountSchema, CreateAccountSchema, UpdateAccountSchema
-from src.specifications import Specification
+from src.specifications import Specification, EqualsSpecification
 from src.repositories.base import BaseRepository
+from src.storage.postgres import database
 
 
 class AccountRepository(BaseRepository):
+    @staticmethod
     async def create(
         connection: Connection,
         data: CreateAccountSchema,
@@ -17,12 +19,13 @@ class AccountRepository(BaseRepository):
             data,
         )
 
+    @staticmethod
     async def get(
         connection: Connection,
         *specifications: Specification,
         page: int = 1,
         page_size: int = 100,
-    ) -> AccountSchema:
+    ) -> list[AccountSchema]:
         return await super(__class__, __class__).get(
             connection,
             'dating.accounts',
@@ -32,6 +35,7 @@ class AccountRepository(BaseRepository):
             page_size=page_size,
         )
 
+    @staticmethod
     async def update(
         connection: Connection,
         *specifications: Specification,
@@ -46,6 +50,7 @@ class AccountRepository(BaseRepository):
             data=data,
         )
 
+    @staticmethod
     async def delete(
         connection: Connection,
         *specifications: Specification,
@@ -57,3 +62,14 @@ class AccountRepository(BaseRepository):
             *specifications,
             delete_all=delete_all,
         )
+
+    @staticmethod
+    async def get_or_create(
+        connection: Connection,
+        data: CreateAccountSchema,
+    ) -> AccountSchema:
+        specification = EqualsSpecification('telegram_id', data.telegram_id)
+        accounts = await AccountRepository.get(connection, specification)
+        if len(accounts):
+            return accounts[0]
+        return await AccountRepository.create(connection, data)
