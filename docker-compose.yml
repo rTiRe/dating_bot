@@ -58,14 +58,60 @@ services:
       - 8010:1337
     networks:
       - accounts_network
+      - profiles_network
+      - external_network
+
+  profiles_db:
+    image: 'postgres:15.5'
+    container_name: profiles_db
+    environment:
+      - POSTGRES_DB=${PROFILES_DB_NAME}
+      - POSTGRES_USER=${PROFILES_DB_USER}
+      - POSTGRES_PASSWORD=${PROFILES_DB_PASS}
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:5452:5432
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-d", "${PROFILES_DB_NAME}", "-U", "${PROFILES_DB_USER}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    volumes:
+      - profiles_pgdata:/var/lib/postgresql/data
+    networks:
+      - profiles_network
+
+  profiles_service:
+    build: ./profiles_service
+    container_name: profiles_service
+    command: bash -c "poetry run yoyo apply -b && poetry run python -m src"
+    stop_signal: SIGINT
+    restart: no
+    depends_on:
+      profiles_db:
+        condition: service_healthy
+    env_file:
+      - profiles_service/config/.env
+    volumes:
+      - ./profiles_service:/usr/src/dating/profiles_service
+    ports:
+      - 8002:8002
+      - 8011:1337
+    networks:
+      - accounts_network
+      - profiles_network
       - external_network
 
 networks:
   accounts_network:
+    driver: bridge
+  profiles_network:
     driver: bridge
   external_network:
     driver: bridge
 
 volumes:
   accounts_pgdata:
+  profiles_pgdata:
   rabbitmq_data:
