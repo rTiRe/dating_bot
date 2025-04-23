@@ -1,9 +1,23 @@
 from datetime import datetime
+from enum import Enum
+from typing import Self, Annotated
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator, field_validator, AfterValidator
 
 from src.api.grpc.protobufs.profiles.profiles_pb2 import Gender
+
+
+class GenderEnum(Enum):
+    GENDER_DEFAULT = Gender.GENDER_DEFAULT
+    GENDER_MALE = Gender.GENDER_MALE
+    GENDER_FEMALE = Gender.GENDER_FEMALE
+
+
+def check_gender(gender: GenderEnum | int) -> GenderEnum:
+    if isinstance(gender, GenderEnum):
+        return gender
+    return GenderEnum(gender)
 
 
 class ProfileSchema(BaseModel):
@@ -12,10 +26,10 @@ class ProfileSchema(BaseModel):
     first_name: str
     last_name: str
     age: int
-    gender: Gender
+    gender: Annotated[GenderEnum | int, AfterValidator(check_gender)]
     biography: str | None = None
     additional_info: str | None = None
-    language: str
+    language_locale: str
     created_at: datetime
     updated_at: datetime
 
@@ -25,10 +39,10 @@ class CreateProfileSchema(BaseModel):
     first_name: str
     last_name: str
     age: int
-    gender: Gender
+    gender: Annotated[GenderEnum | int, AfterValidator(check_gender)]
     biography: str | None = None
     additional_info: str | None = None
-    language: str
+    language_locale: str
 
 
 class UpdateProfileSchema(BaseModel):
@@ -36,7 +50,7 @@ class UpdateProfileSchema(BaseModel):
     first_name: str | None = None
     last_name: str | None = None
     age: int | None = None
-    gender: Gender | None = None
+    gender: Annotated[GenderEnum | int, AfterValidator(check_gender)] | None = None
     biography: str | None = None
     additional_info: str | None = None
-    language: str
+    language_locale: str | None = None

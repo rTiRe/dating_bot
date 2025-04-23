@@ -6,6 +6,8 @@ package dating.service.profiles;
 service ProfilesService {
     rpc Create(ProfileCreateRequest) returns (ProfileCreateResponse);
     rpc Get(ProfilesGetRequest) returns (ProfilesGetResponse);
+    rpc Update(ProfileUpdateRequest) returns (ProfilesUpdateResponse);
+    rpc Delete(ProfileDeleteRequest) returns (ProfilesDeleteResponse);
 }
 
 
@@ -17,14 +19,14 @@ message ProfileCreateRequest {
     Gender gender = 5;
     optional string biography = 6;
     optional string additional_info = 7;
-    string language = 8;
+    string language_locale = 8;
 }
 
 
 message ProfilesGetRequest {
     oneof identifier {
         string id = 1;
-        int64 account_id = 2;
+        string account_id = 2;
     }
 }
 
@@ -38,7 +40,7 @@ message ProfileUpdateRequest {
         optional Gender gender = 5;
         optional string biography = 6;
         optional string additional_info = 7;
-        optional string language = 8;
+        optional string language_locale = 8;
     }
     string id = 1;
     UpdateData data = 2;
@@ -59,7 +61,7 @@ message ProfileCreateResponse {
     Gender gender = 6;
     string biography = 7;
     string additional_info = 8;
-    string language = 9;
+    string language_locale = 9;
     string created_at = 10;
     string updated_at = 11;
 }
@@ -74,7 +76,7 @@ message ProfilesGetResponse {
     Gender gender = 6;
     string biography = 7;
     string additional_info = 8;
-    string language = 9;
+    string language_locale = 9;
     string created_at = 10;
     string updated_at = 11;
 }
