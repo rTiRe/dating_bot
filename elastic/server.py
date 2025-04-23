@@ -5,11 +5,11 @@ import elastic_pb2
 import elastic_pb2_grpc
 import math
 from typing import List, Tuple
-
+import os
 class ElasticSearchServicer(elastic_pb2_grpc.ElasticSearchServicer):
     def __init__(self):
         self.es = Elasticsearch(
-            "http://localhost:9200",
+            os.getenv('ELASTICSEARCH_URL', 'http://localhost:9200'),
             basic_auth=('elastic', 'changeme'),
             verify_certs=False
         )
