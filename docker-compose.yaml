@@ -27,6 +27,26 @@ services:
       nofile:
         soft: 65536
         hard: 65536
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+
+  elastic-service:
+    build:
+      context: ./elastic
+      dockerfile: Dockerfile
+    container_name: elastic-service
+    depends_on:
+      - elasticsearch
+    ports:
+      - "50051:50051"
+    networks:
+      - elastic
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
 
 volumes:
   elasticsearch-data:
