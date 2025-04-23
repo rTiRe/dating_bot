@@ -2,7 +2,7 @@
 
 import logging
 
-from config import settings
+from config.settings import settings
 
 
 class LoggerFilter(logging.Filter):
