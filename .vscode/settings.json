@@ -17,8 +17,8 @@
     ],
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
-        "source.organizeImports": true,
-        "source.fixAll": true
+        "source.organizeImports": "explicit",
+        "source.fixAll": "explicit"
     },
     "editor.rulers": [
         120
@@ -40,7 +40,7 @@
         "editor.defaultFormatter": "ms-python.python",
         "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
-            "source.organizeImports": true
+            "source.organizeImports": "explicit"
         }
     },
     "[proto]": {

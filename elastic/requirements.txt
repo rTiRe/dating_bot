@@ -1,4 +1,14 @@
+certifi==2025.1.31
+charset-normalizer==3.4.1
+elastic-transport==8.17.1
+elasticsearch==8.12.1
 grpcio==1.71.0
 grpcio-tools==1.71.0
+idna==3.10
 protobuf==5.29.4
+python-dateutil==2.9.0.post0
+requests==2.32.3
 setuptools==79.0.0
+six==1.17.0
+typing_extensions==4.13.2
+urllib3==2.4.0
