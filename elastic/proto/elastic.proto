@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package elastic;
+
+service ElasticSearch {
+    rpc GetMatch(GetMatchRequest) returns (GetMatchResponse) {}
+    rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {}
+}
+
+message GetMatchRequest {
+    float lat = 1;
+    float lon = 2;
+    string gender = 3;
+    int32 age_min = 4;
+    int32 age_max = 5;
+    int32 distance = 6;
+    int32 limit = 7;
+}
+
+message GetMatchResponse {
+    repeated string user_ids = 1;
+    int32 total = 2;
+}
+
+message UpdateUserRequest {
+    string user_id = 1;
+    float lat = 2;
+    float lon = 3;
+    int32 age = 4;
+    string gender = 5;
+}
+
+message UpdateUserResponse {
+    string user_id = 1;
+    bool created = 2;
+}
