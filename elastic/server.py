@@ -8,7 +8,7 @@ from typing import List, Tuple
 import os
 class ElasticSearchServicer(elastic_pb2_grpc.ElasticSearchServicer):
     def __init__(self):
-        print(os.getenv('ELASTICSEARCH_URL', 'http://localhost:9200'),)
+        print(os.getenv('ELASTICSEARCH_URL', 'http://localhost:9200'), flush=True)
         self.es = Elasticsearch(
             os.getenv('ELASTICSEARCH_URL', 'http://localhost:9200'),
             basic_auth=('elastic', 'changeme'),
