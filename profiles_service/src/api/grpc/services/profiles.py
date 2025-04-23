@@ -6,7 +6,7 @@ from asyncpg import UniqueViolationError
 from config.logger import logger
 from src.api.grpc.protobufs.profiles import profiles_pb2, profiles_pb2_grpc
 from src.repositories.profiles import ProfilesRepository
-from src.schemas.profile import UpdateProfileSchema, CreateProfileSchema
+from src.schemas.profile import UpdateProfileSchema, CreateProfileSchema, GenderEnum
 from src.specifications.equals import EqualsSpecification
 from src.storage.postgres import database
 
@@ -46,11 +46,11 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
     @staticmethod
     async def __check_gender(gender: int) -> None:
         if not gender:
-            raise ValueError('The age field must be set')
+            raise ValueError('The gender field must be set')
         try:
             int(gender)
         except ValueError:
-            raise ValueError('The age field must be of type Integer')
+            raise ValueError('The gender field must be of type Integer')
         if abs(int(gender)) > 2:
             raise ValueError('There are only two genders, faggot')
 
@@ -79,7 +79,7 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
         'gender': __check_gender,
         'biography': __check_text,
         'additional_info': __check_text,
-        'language': __check_language,
+        'language_locale': __check_language,
     }
 
 
@@ -89,8 +89,8 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
         context: grpc.aio.ServicerContext,
     ) -> profiles_pb2.ProfileCreateResponse:
         try:
-            for name, field_value in request.__dict__.items():
-                await self.name_to_checker[name](field_value)
+            for descriptor, field_value in request.ListFields():
+                await self.name_to_checker[descriptor.name](field_value)
         except ValueError as exception:
             await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
         create_schema = CreateProfileSchema(
@@ -101,7 +101,7 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             gender=request.gender,
             biography=request.biography,
             additional_info=request.additional_info,
-            language=request.language,
+            language_locale=request.language_locale,
         )
         async with database.pool.acquire() as connection:
             try:
@@ -114,10 +114,10 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             first_name=profile.first_name,
             last_name=profile.last_name,
             age=profile.age,
-            gender=profile.gender,
+            gender=profile.gender.name,
             biography=profile.biography,
             additional_info=profile.additional_info,
-            language=request.language,
+            language_locale=request.language_locale,
             created_at=profile.created_at.isoformat(),
             updated_at=profile.updated_at.isoformat(),
         )
@@ -150,10 +150,10 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             first_name=profile.first_name,
             last_name=profile.last_name,
             age=profile.age,
-            gender=profile.gender.value,
+            gender=profile.gender.name,
             biography=profile.biography,
             additional_info=profile.additional_info,
-            language=profile.language,
+            language_locale=profile.language_locale,
             created_at=profile.created_at.isoformat(),
             updated_at=profile.updated_at.isoformat(),
         )
