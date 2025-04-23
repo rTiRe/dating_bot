@@ -1,0 +1,8 @@
+cluster.name: "docker-cluster"
+network.host: 0.0.0.0
+http.host: 0.0.0.0
+transport.host: 127.0.0.1
+discovery.type: single-node
+xpack.security.enabled: true
+http.cors.enabled: true
+http.cors.allow-origin: "*"
