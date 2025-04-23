@@ -18,8 +18,7 @@ message ProfileCreateRequest {
     int32 age = 4;
     Gender gender = 5;
     optional string biography = 6;
-    optional string additional_info = 7;
-    string language_locale = 8;
+    string language_locale = 7;
 }
 
 
@@ -39,8 +38,7 @@ message ProfileUpdateRequest {
         optional int32 age = 4;
         optional Gender gender = 5;
         optional string biography = 6;
-        optional string additional_info = 7;
-        optional string language_locale = 8;
+        optional string language_locale = 7;
     }
     string id = 1;
     UpdateData data = 2;
@@ -60,10 +58,9 @@ message ProfileCreateResponse {
     int32 age = 5;
     Gender gender = 6;
     string biography = 7;
-    string additional_info = 8;
-    string language_locale = 9;
-    string created_at = 10;
-    string updated_at = 11;
+    string language_locale = 8;
+    string created_at = 9;
+    string updated_at = 10;
 }
 
 
@@ -75,10 +72,9 @@ message ProfilesGetResponse {
     int32 age = 5;
     Gender gender = 6;
     string biography = 7;
-    string additional_info = 8;
-    string language_locale = 9;
-    string created_at = 10;
-    string updated_at = 11;
+    string language_locale = 8;
+    string created_at = 9;
+    string updated_at = 10;
 }
 
 

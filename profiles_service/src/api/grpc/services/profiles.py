@@ -78,7 +78,6 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
         'age': __check_age,
         'gender': __check_gender,
         'biography': __check_text,
-        'additional_info': __check_text,
         'language_locale': __check_language,
     }
 
@@ -100,7 +99,6 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             age=request.age,
             gender=request.gender,
             biography=request.biography,
-            additional_info=request.additional_info,
             language_locale=request.language_locale,
         )
         async with database.pool.acquire() as connection:
@@ -116,7 +114,6 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             age=profile.age,
             gender=profile.gender.name,
             biography=profile.biography,
-            additional_info=profile.additional_info,
             language_locale=request.language_locale,
             created_at=profile.created_at.isoformat(),
             updated_at=profile.updated_at.isoformat(),
@@ -152,7 +149,6 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             age=profile.age,
             gender=profile.gender.name,
             biography=profile.biography,
-            additional_info=profile.additional_info,
             language_locale=profile.language_locale,
             created_at=profile.created_at.isoformat(),
             updated_at=profile.updated_at.isoformat(),

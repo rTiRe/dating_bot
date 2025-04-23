@@ -28,7 +28,6 @@ class ProfileSchema(BaseModel):
     age: int
     gender: Annotated[GenderEnum | int, AfterValidator(check_gender)]
     biography: str | None = None
-    additional_info: str | None = None
     language_locale: str
     created_at: datetime
     updated_at: datetime
@@ -41,7 +40,6 @@ class CreateProfileSchema(BaseModel):
     age: int
     gender: Annotated[GenderEnum | int, AfterValidator(check_gender)]
     biography: str | None = None
-    additional_info: str | None = None
     language_locale: str
 
 
@@ -52,5 +50,4 @@ class UpdateProfileSchema(BaseModel):
     age: int | None = None
     gender: Annotated[GenderEnum | int, AfterValidator(check_gender)] | None = None
     biography: str | None = None
-    additional_info: str | None = None
     language_locale: str | None = None
