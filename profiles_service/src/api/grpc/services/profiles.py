@@ -89,8 +89,7 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
     name_to_checker = {
         'id': __check_id,
         'account_id': __check_id,
-        'first_name': __check_name,
-        'last_name': __check_name,
+        'name': __check_name,
         'age': __check_age,
         'gender': __check_gender,
         'biography': __check_text,
@@ -113,8 +112,7 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
         create_schema = CreateProfileSchema(
             account_id=UUID(request.account_id),
-            first_name=request.first_name,
-            last_name=request.last_name,
+            name=request.name,
             age=request.age,
             gender=request.gender,
             biography=request.biography,
@@ -140,8 +138,7 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
         return profiles_pb2.ProfileCreateResponse(
             id=str(profile.id),
             account_id=str(profile.account_id),
-            first_name=profile.first_name,
-            last_name=profile.last_name,
+            name=profile.name,
             age=profile.age,
             gender=profile.gender.name,
             biography=profile.biography,
@@ -178,8 +175,7 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
         return profiles_pb2.ProfilesGetResponse(
             id=str(profile.id),
             account_id=str(profile.account_id),
-            first_name=profile.first_name,
-            last_name=profile.last_name,
+            name=profile.name,
             age=profile.age,
             gender=profile.gender.name,
             biography=profile.biography,
