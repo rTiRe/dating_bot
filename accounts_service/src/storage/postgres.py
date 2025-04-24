@@ -1,5 +1,11 @@
 import asyncpg
+
 from config import settings
+
+MIN_POOL_SIZE = 1
+MAX_POOL_SIZE = 15
+MAX_POOL_QUERIES = 50000
+MAX_POOL_INACTIVAE_CONNECTION_LIFETIME = 300.0
 
 
 class DBConnection:
@@ -9,10 +15,10 @@ class DBConnection:
     async def connect(self) -> None:
         self._pool = await asyncpg.create_pool(
             dsn=self._db_url,
-            min_size=1,
-            max_size=15,
-            max_queries=50000,
-            max_inactive_connection_lifetime=300.0,
+            min_size=MIN_POOL_SIZE,
+            max_size=MAX_POOL_SIZE,
+            max_queries=MAX_POOL_QUERIES,
+            max_inactive_connection_lifetime=MAX_POOL_INACTIVAE_CONNECTION_LIFETIME,
         )
 
     @property

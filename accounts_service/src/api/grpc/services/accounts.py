@@ -1,20 +1,19 @@
 from uuid import UUID
 
-from asyncpg.exceptions import UniqueViolationError
 import grpc
+from asyncpg.exceptions import UniqueViolationError
 
 from config import logger
-from src.api.grpc.protobufs.accounts import accounts_pb2, accounts_pb2_grpc
-from src.repositories import AccountRepository
+from src.api.grpc.protobufs import accounts_pb2, accounts_pb2_grpc
+from src.repositories import AccountsRepository
+from src.schemas import CreateAccountSchema, UpdateAccountSchema
 from src.specifications import EqualsSpecification
 from src.storage.postgres import database
-from src.schemas import UpdateAccountSchema, CreateAccountSchema
-
 
 logger = logger(__name__)
 
 
-class AccountsService(accounts_pb2_grpc.AccountsServiceServicer):
+class AccountsService(accounts_pb2_grpc.AccountsServiceServicer):  # noqa: WPS214, WPS338
     @staticmethod
     async def serve() -> None:
         server = grpc.aio.server()
@@ -39,7 +38,9 @@ class AccountsService(accounts_pb2_grpc.AccountsServiceServicer):
 
     @staticmethod
     async def __check_telegram_username(telegram_username: str) -> None:
-        if telegram_username and not (4 <= len(telegram_username) <= 32):
+        min_username_length = 4
+        max_username_length = 32
+        if telegram_username and not (min_username_length <= len(telegram_username) <= max_username_length):
             raise ValueError(
                 'The length of the telegram_username field value must be from 4 to 32 characters',
             )
@@ -55,7 +56,7 @@ class AccountsService(accounts_pb2_grpc.AccountsServiceServicer):
         request: accounts_pb2.AccountsCreateRequest,
         context: grpc.aio.ServicerContext,
     ) -> accounts_pb2.AccountsCreateResponse:
-        try:
+        try:  # noqa: WPS229
             await self.__check_telegram_id(request.telegram_id)
             await self.__check_telegram_username(request.telegram_username)
         except ValueError as exception:
@@ -66,7 +67,7 @@ class AccountsService(accounts_pb2_grpc.AccountsServiceServicer):
         )
         async with database.pool.acquire() as connection:
             try:
-                account = await AccountRepository.create(connection, create_schema)
+                account = await AccountsRepository.create(connection, create_schema)
             except UniqueViolationError:
                 await context.abort(grpc.StatusCode.ALREADY_EXISTS)
         return accounts_pb2.AccountsCreateResponse(
@@ -94,7 +95,7 @@ class AccountsService(accounts_pb2_grpc.AccountsServiceServicer):
             await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
         specification = EqualsSpecification(identifier_field, getattr(request, identifier_field))
         async with database.pool.acquire() as connection:
-            accounts = (await AccountRepository.get(connection, specification))
+            accounts = (await AccountsRepository.get(connection, specification))
             if len(accounts) == 0:
                 await context.abort(grpc.StatusCode.NOT_FOUND)
             account = accounts[0]
@@ -105,7 +106,7 @@ class AccountsService(accounts_pb2_grpc.AccountsServiceServicer):
                 except ValueError as exception:
                     await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
                 update_data = UpdateAccountSchema(telegram_username=request.telegram_username)
-                await AccountRepository.update(connection, specification, data=update_data)
+                await AccountsRepository.update(connection, specification, update_data=update_data)
                 setattr(account, 'telegram_username', update_data.telegram_username)
         return accounts_pb2.AccountsGetResponse(
             id=str(account.id),
@@ -120,23 +121,24 @@ class AccountsService(accounts_pb2_grpc.AccountsServiceServicer):
         request: accounts_pb2.AccountsUpdateRequest,
         context: grpc.aio.ServicerContext,
     ) -> accounts_pb2.AccountsUpdateResponse:
-        try:
-            await self.__check_id(request.id)
-        except ValueError as exception:
-            await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
-        update_data = {descriptor.name: value for descriptor, value in request.data.ListFields()}
+        update_data = {descriptor.name: field_value for descriptor, field_value in request.data.ListFields()}
         if not update_data:
             await context.abort(grpc.StatusCode.INVALID_ARGUMENT, 'Empty update data')
-        for name, value in update_data.items():
-            try:
-                await self.name_to_checker[name](value)
+        for name, field_value in update_data.items():
+            try:  # noqa: WPS229
+                await self.__check_id(request.id)
+                await self.name_to_checker[name](field_value)
             except ValueError as exception:
                 await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
         specification = EqualsSpecification('id', request.id)
-        data = UpdateAccountSchema(**update_data)
+        update_schema = UpdateAccountSchema(**update_data)
         async with database.pool.acquire() as connection:
             try:
-                update_result = await AccountRepository.update(connection, specification, data=data)
+                update_result = await AccountsRepository.update(
+                    connection,
+                    specification,
+                    update_data=update_schema,
+                )
             except UniqueViolationError as exception:
                 logger.error(exception)
                 await context.abort(
@@ -156,7 +158,7 @@ class AccountsService(accounts_pb2_grpc.AccountsServiceServicer):
             await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
         delete_specification = EqualsSpecification('id', request.id)
         async with database.pool.acquire() as connection:
-            delete_result = await AccountRepository.delete(connection, delete_specification)
+            delete_result = await AccountsRepository.delete(connection, delete_specification)
         return accounts_pb2.AccountsDeleteResponse(result=delete_result)
 
     async def GetOrCreate(
@@ -164,7 +166,7 @@ class AccountsService(accounts_pb2_grpc.AccountsServiceServicer):
         request: accounts_pb2.AccountsCreateRequest,
         context: grpc.aio.ServicerContext,
     ) -> accounts_pb2.AccountsGetResponse:
-        try:
+        try:  # noqa: WPS229
             await self.__check_telegram_id(request.telegram_id)
             await self.__check_telegram_username(request.telegram_username)
         except ValueError as exception:
@@ -177,13 +179,13 @@ class AccountsService(accounts_pb2_grpc.AccountsServiceServicer):
         )
         async with database.pool.acquire() as connection:
             try:
-                account = await AccountRepository.get_or_create(connection, create_schema)
+                account = await AccountsRepository.get_or_create(connection, create_schema)
             except Exception as exception:
                 logger.error(exception)
                 await context.abort(grpc.StatusCode.INTERNAL)
             if is_username_setted and account.telegram_username != request.telegram_username:
                 update_data = UpdateAccountSchema(telegram_username=request.telegram_username)
-                await AccountRepository.update(connection, specification, data=update_data)
+                await AccountsRepository.update(connection, specification, update_data=update_data)
                 setattr(account, 'telegram_username', update_data.telegram_username)
         return accounts_pb2.AccountsGetResponse(
             id=str(account.id),

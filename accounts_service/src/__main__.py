@@ -6,9 +6,8 @@ import uvicorn
 from fastapi import FastAPI
 
 from config import logger
-from src.storage import database
 from src.api.grpc.services import AccountsService
-
+from src.storage import database
 
 logger = logger(__name__)
 
@@ -31,7 +30,7 @@ if __name__ == '__main__':
         'src.__main__:create_app',
         factory=True,
         host='127.0.0.1',
-        port=8001,
+        port=8001,  # noqa: WPS432
         workers=1,
         access_log=False,
     )

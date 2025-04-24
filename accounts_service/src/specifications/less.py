@@ -4,17 +4,14 @@ from src.specifications.base import Specification
 
 
 class LessThanSpecification(Specification):
-    def __init__(self, attribute: str, value: Any) -> None:
+    def __init__(self, attribute: str, compare_value: Any) -> None:
         self.attribute = attribute
-        self.value = value
+        self.compare_value = compare_value
 
     async def to_sql(self) -> tuple[str, list[Any]]:
-        return f'{self.attribute} < ??', [self.value]
+        return f'{self.attribute} < ??', [self.compare_value]
 
 
 class LessEqualsSpecification(LessThanSpecification):
-    def __init__(self, attribute: str, value: Any) -> None:
-        super().__init__(attribute, value)
-
     async def to_sql(self) -> tuple[str, list[Any]]:
-        return f'{self.attribute} <= ??', [self.value]
+        return f'{self.attribute} <= ??', [self.compare_value]

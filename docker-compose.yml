@@ -19,6 +19,30 @@ services:
     networks:
       - external_network
 
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+    ports:
+      - "9000:9000"   # API
+      - "9001:9001"   # web console
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/ready" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    volumes:
+      - minio_data:/data
+    networks:
+      - external_network
+      - profiles_network
+      - accounts_network
+
+
   accounts_db:
     image: 'postgres:15.5'
     container_name: accounts_db
@@ -54,10 +78,59 @@ services:
     volumes:
       - ./accounts_service:/usr/src/dating/accounts_service
     ports:
-      - 8001:8001
-      - 8010:1337
+      - "8001:8001"
+      - "8010:1337"
     networks:
       - accounts_network
+      - profiles_network
+      - external_network
+
+  profiles_db:
+    image: 'postgres:15.5'
+    container_name: profiles_db
+    environment:
+      - POSTGRES_DB=${PROFILES_DB_NAME}
+      - POSTGRES_USER=${PROFILES_DB_USER}
+      - POSTGRES_PASSWORD=${PROFILES_DB_PASS}
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:5452:5432
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-d", "${PROFILES_DB_NAME}", "-U", "${PROFILES_DB_USER}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    volumes:
+      - profiles_pgdata:/var/lib/postgresql/data
+    networks:
+      - profiles_network
+
+  profiles_service:
+    build: ./profiles_service
+    container_name: profiles_service
+    command: bash -c "poetry run yoyo apply -b && poetry run python -m src"
+    stop_signal: SIGINT
+    restart: no
+    depends_on:
+      profiles_db:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    env_file:
+      - profiles_service/config/.env
+    environment:
+      MINIO_ENDPOINT: minio:9000
+      MINIO_SECURE: "false"
+      MINIO_BUCKET: "profiles-images"
+    volumes:
+      - ./profiles_service:/usr/src/dating/profiles_service
+    ports:
+      - "8002:8002"
+      - "8011:1337"
+    networks:
+      - accounts_network
+      - profiles_network
       - external_network
 
   bot_service:
@@ -84,9 +157,13 @@ networks:
     driver: bridge
   bot_network:
     driver: bridge
+  profiles_network:
+    driver: bridge
   external_network:
     driver: bridge
 
 volumes:
   accounts_pgdata:
+  profiles_pgdata:
   rabbitmq_data:
+  minio_data:

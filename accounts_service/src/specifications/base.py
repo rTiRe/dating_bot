@@ -7,8 +7,8 @@ class Specification(ABC):
     async def to_asyncpg_query(query: str) -> str:
         parts = query.split('??')
         new_query = []
-        for i, part in enumerate(parts[:-1]):
-            new_query.append(part + f'${i+1}')
+        for num, part in enumerate(parts[:-1]):
+            new_query.append(f'{part}${num + 1}')  # noqa: WPS237
         new_query.append(parts[-1])
         return ''.join(new_query)
 
@@ -35,12 +35,12 @@ class AndSpecification(Specification):
 
     async def to_sql(self) -> tuple[str, list[Any]]:
         conditions = []
-        params = []
-        for spec in self.specifications:
-            condition, param = await spec.to_sql()
+        conditions_params = []
+        for specification in self.specifications:
+            condition, condition_param = await specification.to_sql()
             conditions.append(condition)
-            params.extend(param)
-        return ' and '.join(f'({condition})' for condition in conditions), params
+            conditions_params.extend(condition_param)
+        return ' and '.join(f'({condition})' for condition in conditions), conditions_params
 
 
 class OrSpecification(Specification):
@@ -49,12 +49,12 @@ class OrSpecification(Specification):
 
     async def to_sql(self) -> tuple[str, list[Any]]:
         conditions = []
-        params = []
-        for spec in self.specifications:
-            condition, param = await spec.to_sql()
+        conditions_params = []
+        for specification in self.specifications:
+            condition, condition_param = await specification.to_sql()
             conditions.append(condition)
-            params.extend(param)
-        return ' or '.join(f'({condition})' for condition in conditions), params
+            conditions_params.extend(condition_param)
+        return ' or '.join(f'({condition})' for condition in conditions), conditions_params
 
 
 class NotSpecification(Specification):
@@ -62,5 +62,5 @@ class NotSpecification(Specification):
         self.specification = specification
 
     async def to_sql(self) -> tuple[str, list[Any]]:
-        condition, params = await self.specification.to_sql()
-        return f'not ({condition})', params
+        condition, condition_param = await self.specification.to_sql()
+        return f'not ({condition})', condition_param
