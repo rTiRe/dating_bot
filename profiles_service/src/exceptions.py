@@ -8,3 +8,6 @@ class DeleteAllRowsException(ProfileBaseException):
 
 class UpdateAllRowsException(ProfileBaseException):
     ...  # noqa: WPS604
+
+class ImageDeletionError(ProfileBaseException):
+    ...
