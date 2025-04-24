@@ -8,6 +8,7 @@ from src.states import ProfileCreationStates
 
 @router.message(ProfileCreationStates.name, F.text)
 async def age(message: types.Message, state: FSMContext) -> types.Message:
+    is_creation = await state.get_state() == ProfileCreationStates.name
     if message.text == 'Взять из профиля':
         user_name = message.from_user.first_name
     else:
@@ -21,6 +22,7 @@ async def age(message: types.Message, state: FSMContext) -> types.Message:
         await render(
             'profile/create/2_age',
             user_name=user_name,
+            first_meet=is_creation,
         ),
         reply_markup=ReplyKeyboardRemove(),
     )
