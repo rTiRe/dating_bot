@@ -53,6 +53,17 @@ class ProfilesConnection(BaseConnection):
             lon=coordinates['lon'],
         )
         return self.stub.Create(profile_request)
+    
+    async def get_by_account_id(
+        self,
+        account_id: UUID | str,
+    ) -> profiles_pb2.ProfilesGetResponse:
+        if not isinstance(account_id, UUID):
+            account_id = UUID(account_id)  # noqa: WPS125
+        profile_request = profiles_pb2.ProfilesGetRequest(
+            account_id=str(account_id),
+        )
+        return self.stub.Get(profile_request)
 
 
 profiles_connection = ProfilesConnection(settings.PROFILES_GRPC_URL)

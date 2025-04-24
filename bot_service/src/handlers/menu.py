@@ -1,14 +1,21 @@
+from base64 import b64decode
+from time import time
+
 from aiogram import F, types
 from aiogram.utils.media_group import MediaGroupBuilder
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
+from grpc import RpcError, StatusCode
 
 from src.handlers.profile.create.router import router
 from src.templates import render
 from src.states import MainStates
 from src.handlers.profile.create.name import name
-from src.api.grpc.connections import accounts_connection
+from src.api.grpc.connections import accounts_connection, profiles_connection
+from config import logger
+
+logger = logger(__name__)
 
 @router.message(F.text == '💤')
 async def menu(
@@ -22,7 +29,14 @@ async def menu(
         (await accounts_connection.get_or_create(message.from_user.id, message.from_user.username)).id,
     )
     await state.set_data({'account_id': account_id})
-    profile_data = {} # GET
+    try:
+        profile_data = await profiles_connection.get_by_account_id(account_id)
+    except RpcError as exception:
+        if exception.code() == StatusCode.NOT_FOUND:
+            profile_data = {}
+        else:
+            logger.exception(exception)
+            raise exception
     if not profile_data:
         return await name(message, state)
     introduce_message = await message.answer(
@@ -31,21 +45,23 @@ async def menu(
     )
     caption = await render(
         'profile/profile',
-        name=profile_data['name'],
-        age=profile_data['age'],
-        city_location=profile_data['city_location'],
-        user_location=profile_data['user_location'],
-        description=profile_data['description'],
+        name=profile_data.first_name,
+        age=profile_data.age,
+        # city_location=profile_data['city_location'],
+        # user_location=profile_data['user_location'],
+        description=profile_data.biography,
     )
-    if len(profile_data['photos']) == 1:
+    if len(profile_data.image_base64_list) == 1:
         profile_message = await message.answer_photo(
-            photo=list(profile_data['photos'].keys())[0],
+            photo=b64decode(profile_data.image_base64_list[0]),
             caption=caption,
         )
     else:
         media_group = MediaGroupBuilder(caption=caption)
-        for num, photo_id in enumerate(profile_data['photos'].keys()):
-            media_group.add_photo(photo_id)
+        for num, photo_base64 in enumerate(profile_data.image_base64_list):
+            media_group.add_photo(
+                types.BufferedInputFile(b64decode(photo_base64), f'{account_id}_{int(time() * 100)}_{num}'),
+            )
         profile_message = await message.answer_media_group(media=media_group.build())
     menu_message = await message.answer(
         await render('menu'),
