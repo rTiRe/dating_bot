@@ -1,22 +1,21 @@
 from asyncpg.connection import Connection
 
-from src.schemas import AccountSchema, CreateAccountSchema, UpdateAccountSchema
-from src.specifications import Specification, EqualsSpecification
 from src.repositories.base import BaseRepository
-from src.storage.postgres import database
+from src.schemas import AccountSchema, CreateAccountSchema, UpdateAccountSchema
+from src.specifications import EqualsSpecification, Specification
 
 
-class AccountRepository(BaseRepository):
+class AccountsRepository(BaseRepository):
     @staticmethod
     async def create(
         connection: Connection,
-        data: CreateAccountSchema,
+        create_data: CreateAccountSchema,
     ) -> AccountSchema:
         return await super(__class__, __class__).create(
             connection,
             'dating.accounts',
             AccountSchema,
-            data,
+            create_data,
         )
 
     @staticmethod
@@ -40,14 +39,14 @@ class AccountRepository(BaseRepository):
         connection: Connection,
         *specifications: Specification,
         update_all: bool = False,
-        data: UpdateAccountSchema,
+        update_data: UpdateAccountSchema,
     ) -> str:
         return await super(__class__, __class__).update(
             connection,
             'dating.accounts',
             *specifications,
             update_all=update_all,
-            data=data,
+            update_data=update_data,
         )
 
     @staticmethod
@@ -66,10 +65,10 @@ class AccountRepository(BaseRepository):
     @staticmethod
     async def get_or_create(
         connection: Connection,
-        data: CreateAccountSchema,
+        create_data: CreateAccountSchema,
     ) -> AccountSchema:
-        specification = EqualsSpecification('telegram_id', data.telegram_id)
-        accounts = await AccountRepository.get(connection, specification)
+        specification = EqualsSpecification('telegram_id', create_data.telegram_id)
+        accounts = await AccountsRepository.get(connection, specification)
         if len(accounts):
             return accounts[0]
-        return await AccountRepository.create(connection, data)
+        return await AccountsRepository.create(connection, create_data)

@@ -6,7 +6,7 @@ WORKDIR /usr/src/dating/accounts_service
 COPY . /usr/src/dating/accounts_service
 
 RUN pip install --upgrade pip
-RUN pip3 install --upgrade  poetry==2.1.2
+RUN pip3 install --upgrade poetry==2.1.2
 
 RUN python3 -m poetry config virtualenvs.create false \
     && python3 -m poetry install --no-interaction --no-ansi \
