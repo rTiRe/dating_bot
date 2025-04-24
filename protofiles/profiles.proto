@@ -19,6 +19,9 @@ message ProfileCreateRequest {
     Gender gender = 5;
     optional string biography = 6;
     string language_locale = 7;
+    repeated string image_base64_list = 8;
+    float lat = 9;
+    float lon = 10;
 }
 
 
@@ -39,6 +42,9 @@ message ProfileUpdateRequest {
         optional Gender gender = 5;
         optional string biography = 6;
         optional string language_locale = 7;
+        repeated string image_base64_list = 8;
+        optional float lat = 9;
+        optional float lon = 10;
     }
     string id = 1;
     UpdateData data = 2;
@@ -61,6 +67,9 @@ message ProfileCreateResponse {
     string language_locale = 8;
     string created_at = 9;
     string updated_at = 10;
+    repeated string image_base64_list = 11;
+    float lat = 12;
+    float lon = 13;
 }
 
 
@@ -75,6 +84,9 @@ message ProfilesGetResponse {
     string language_locale = 8;
     string created_at = 9;
     string updated_at = 10;
+    repeated string image_base64_list = 11;
+    float lat = 12;
+    float lon = 13;
 }
 
 

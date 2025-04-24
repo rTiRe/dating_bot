@@ -1,7 +1,8 @@
+from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Optional, Union as _Union
+from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -15,7 +16,7 @@ GENDER_MALE: Gender
 GENDER_FEMALE: Gender
 
 class ProfileCreateRequest(_message.Message):
-    __slots__ = ("account_id", "first_name", "last_name", "age", "gender", "biography", "language_locale")
+    __slots__ = ("account_id", "first_name", "last_name", "age", "gender", "biography", "language_locale", "image_base64_list", "lat", "lon")
     ACCOUNT_ID_FIELD_NUMBER: _ClassVar[int]
     FIRST_NAME_FIELD_NUMBER: _ClassVar[int]
     LAST_NAME_FIELD_NUMBER: _ClassVar[int]
@@ -23,6 +24,9 @@ class ProfileCreateRequest(_message.Message):
     GENDER_FIELD_NUMBER: _ClassVar[int]
     BIOGRAPHY_FIELD_NUMBER: _ClassVar[int]
     LANGUAGE_LOCALE_FIELD_NUMBER: _ClassVar[int]
+    IMAGE_BASE64_LIST_FIELD_NUMBER: _ClassVar[int]
+    LAT_FIELD_NUMBER: _ClassVar[int]
+    LON_FIELD_NUMBER: _ClassVar[int]
     account_id: str
     first_name: str
     last_name: str
@@ -30,7 +34,10 @@ class ProfileCreateRequest(_message.Message):
     gender: Gender
     biography: str
     language_locale: str
-    def __init__(self, account_id: _Optional[str] = ..., first_name: _Optional[str] = ..., last_name: _Optional[str] = ..., age: _Optional[int] = ..., gender: _Optional[_Union[Gender, str]] = ..., biography: _Optional[str] = ..., language_locale: _Optional[str] = ...) -> None: ...
+    image_base64_list: _containers.RepeatedScalarFieldContainer[str]
+    lat: float
+    lon: float
+    def __init__(self, account_id: _Optional[str] = ..., first_name: _Optional[str] = ..., last_name: _Optional[str] = ..., age: _Optional[int] = ..., gender: _Optional[_Union[Gender, str]] = ..., biography: _Optional[str] = ..., language_locale: _Optional[str] = ..., image_base64_list: _Optional[_Iterable[str]] = ..., lat: _Optional[float] = ..., lon: _Optional[float] = ...) -> None: ...
 
 class ProfilesGetRequest(_message.Message):
     __slots__ = ("id", "account_id")
@@ -43,7 +50,7 @@ class ProfilesGetRequest(_message.Message):
 class ProfileUpdateRequest(_message.Message):
     __slots__ = ("id", "data")
     class UpdateData(_message.Message):
-        __slots__ = ("account_id", "first_name", "last_name", "age", "gender", "biography", "language_locale")
+        __slots__ = ("account_id", "first_name", "last_name", "age", "gender", "biography", "language_locale", "image_base64_list", "lat", "lon")
         ACCOUNT_ID_FIELD_NUMBER: _ClassVar[int]
         FIRST_NAME_FIELD_NUMBER: _ClassVar[int]
         LAST_NAME_FIELD_NUMBER: _ClassVar[int]
@@ -51,6 +58,9 @@ class ProfileUpdateRequest(_message.Message):
         GENDER_FIELD_NUMBER: _ClassVar[int]
         BIOGRAPHY_FIELD_NUMBER: _ClassVar[int]
         LANGUAGE_LOCALE_FIELD_NUMBER: _ClassVar[int]
+        IMAGE_BASE64_LIST_FIELD_NUMBER: _ClassVar[int]
+        LAT_FIELD_NUMBER: _ClassVar[int]
+        LON_FIELD_NUMBER: _ClassVar[int]
         account_id: str
         first_name: str
         last_name: str
@@ -58,7 +68,10 @@ class ProfileUpdateRequest(_message.Message):
         gender: Gender
         biography: str
         language_locale: str
-        def __init__(self, account_id: _Optional[str] = ..., first_name: _Optional[str] = ..., last_name: _Optional[str] = ..., age: _Optional[int] = ..., gender: _Optional[_Union[Gender, str]] = ..., biography: _Optional[str] = ..., language_locale: _Optional[str] = ...) -> None: ...
+        image_base64_list: _containers.RepeatedScalarFieldContainer[str]
+        lat: float
+        lon: float
+        def __init__(self, account_id: _Optional[str] = ..., first_name: _Optional[str] = ..., last_name: _Optional[str] = ..., age: _Optional[int] = ..., gender: _Optional[_Union[Gender, str]] = ..., biography: _Optional[str] = ..., language_locale: _Optional[str] = ..., image_base64_list: _Optional[_Iterable[str]] = ..., lat: _Optional[float] = ..., lon: _Optional[float] = ...) -> None: ...
     ID_FIELD_NUMBER: _ClassVar[int]
     DATA_FIELD_NUMBER: _ClassVar[int]
     id: str
@@ -72,7 +85,7 @@ class ProfileDeleteRequest(_message.Message):
     def __init__(self, id: _Optional[str] = ...) -> None: ...
 
 class ProfileCreateResponse(_message.Message):
-    __slots__ = ("id", "account_id", "first_name", "last_name", "age", "gender", "biography", "language_locale", "created_at", "updated_at")
+    __slots__ = ("id", "account_id", "first_name", "last_name", "age", "gender", "biography", "language_locale", "created_at", "updated_at", "image_base64_list", "lat", "lon")
     ID_FIELD_NUMBER: _ClassVar[int]
     ACCOUNT_ID_FIELD_NUMBER: _ClassVar[int]
     FIRST_NAME_FIELD_NUMBER: _ClassVar[int]
@@ -83,6 +96,9 @@ class ProfileCreateResponse(_message.Message):
     LANGUAGE_LOCALE_FIELD_NUMBER: _ClassVar[int]
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
     UPDATED_AT_FIELD_NUMBER: _ClassVar[int]
+    IMAGE_BASE64_LIST_FIELD_NUMBER: _ClassVar[int]
+    LAT_FIELD_NUMBER: _ClassVar[int]
+    LON_FIELD_NUMBER: _ClassVar[int]
     id: str
     account_id: str
     first_name: str
@@ -93,10 +109,13 @@ class ProfileCreateResponse(_message.Message):
     language_locale: str
     created_at: str
     updated_at: str
-    def __init__(self, id: _Optional[str] = ..., account_id: _Optional[str] = ..., first_name: _Optional[str] = ..., last_name: _Optional[str] = ..., age: _Optional[int] = ..., gender: _Optional[_Union[Gender, str]] = ..., biography: _Optional[str] = ..., language_locale: _Optional[str] = ..., created_at: _Optional[str] = ..., updated_at: _Optional[str] = ...) -> None: ...
+    image_base64_list: _containers.RepeatedScalarFieldContainer[str]
+    lat: float
+    lon: float
+    def __init__(self, id: _Optional[str] = ..., account_id: _Optional[str] = ..., first_name: _Optional[str] = ..., last_name: _Optional[str] = ..., age: _Optional[int] = ..., gender: _Optional[_Union[Gender, str]] = ..., biography: _Optional[str] = ..., language_locale: _Optional[str] = ..., created_at: _Optional[str] = ..., updated_at: _Optional[str] = ..., image_base64_list: _Optional[_Iterable[str]] = ..., lat: _Optional[float] = ..., lon: _Optional[float] = ...) -> None: ...
 
 class ProfilesGetResponse(_message.Message):
-    __slots__ = ("id", "account_id", "first_name", "last_name", "age", "gender", "biography", "language_locale", "created_at", "updated_at")
+    __slots__ = ("id", "account_id", "first_name", "last_name", "age", "gender", "biography", "language_locale", "created_at", "updated_at", "image_base64_list", "lat", "lon")
     ID_FIELD_NUMBER: _ClassVar[int]
     ACCOUNT_ID_FIELD_NUMBER: _ClassVar[int]
     FIRST_NAME_FIELD_NUMBER: _ClassVar[int]
@@ -107,6 +126,9 @@ class ProfilesGetResponse(_message.Message):
     LANGUAGE_LOCALE_FIELD_NUMBER: _ClassVar[int]
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
     UPDATED_AT_FIELD_NUMBER: _ClassVar[int]
+    IMAGE_BASE64_LIST_FIELD_NUMBER: _ClassVar[int]
+    LAT_FIELD_NUMBER: _ClassVar[int]
+    LON_FIELD_NUMBER: _ClassVar[int]
     id: str
     account_id: str
     first_name: str
@@ -117,7 +139,10 @@ class ProfilesGetResponse(_message.Message):
     language_locale: str
     created_at: str
     updated_at: str
-    def __init__(self, id: _Optional[str] = ..., account_id: _Optional[str] = ..., first_name: _Optional[str] = ..., last_name: _Optional[str] = ..., age: _Optional[int] = ..., gender: _Optional[_Union[Gender, str]] = ..., biography: _Optional[str] = ..., language_locale: _Optional[str] = ..., created_at: _Optional[str] = ..., updated_at: _Optional[str] = ...) -> None: ...
+    image_base64_list: _containers.RepeatedScalarFieldContainer[str]
+    lat: float
+    lon: float
+    def __init__(self, id: _Optional[str] = ..., account_id: _Optional[str] = ..., first_name: _Optional[str] = ..., last_name: _Optional[str] = ..., age: _Optional[int] = ..., gender: _Optional[_Union[Gender, str]] = ..., biography: _Optional[str] = ..., language_locale: _Optional[str] = ..., created_at: _Optional[str] = ..., updated_at: _Optional[str] = ..., image_base64_list: _Optional[_Iterable[str]] = ..., lat: _Optional[float] = ..., lon: _Optional[float] = ...) -> None: ...
 
 class ProfilesUpdateResponse(_message.Message):
     __slots__ = ("result",)

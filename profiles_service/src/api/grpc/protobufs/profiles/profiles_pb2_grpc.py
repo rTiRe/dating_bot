@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-import profiles_pb2 as profiles__pb2
+from . import profiles_pb2 as profiles__pb2
 
 GRPC_GENERATED_VERSION = '1.71.0'
 GRPC_VERSION = grpc.__version__

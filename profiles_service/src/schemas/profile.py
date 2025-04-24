@@ -31,6 +31,8 @@ class ProfileSchema(BaseModel):
     language_locale: str
     created_at: datetime
     updated_at: datetime
+    lat: float
+    lon: float
 
 
 class CreateProfileSchema(BaseModel):
@@ -41,6 +43,8 @@ class CreateProfileSchema(BaseModel):
     gender: Annotated[GenderEnum | int, AfterValidator(check_gender)]
     biography: str | None = None
     language_locale: str
+    lat: float
+    lon: float
 
 
 class UpdateProfileSchema(BaseModel):
@@ -51,3 +55,4 @@ class UpdateProfileSchema(BaseModel):
     gender: Annotated[GenderEnum | int, AfterValidator(check_gender)] | None = None
     biography: str | None = None
     language_locale: str | None = None
+    # TODO lat lon images
