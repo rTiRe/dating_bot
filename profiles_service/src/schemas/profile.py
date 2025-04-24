@@ -56,4 +56,6 @@ class UpdateProfileSchema(BaseModel):
     gender: Annotated[GenderEnum | int, AfterValidator(check_gender)] | None = None
     biography: str | None = None
     language_locale: str | None = None
-    # TODO lat lon images
+    image_base64_list: list[str] | None = None
+    lat: float | None = None
+    lon: float | None = None
