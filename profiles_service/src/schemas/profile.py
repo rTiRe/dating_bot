@@ -31,6 +31,7 @@ class ProfileSchema(BaseModel):
     language_locale: str
     created_at: datetime
     updated_at: datetime
+    image_names: list[str]
     lat: float
     lon: float
 

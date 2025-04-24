@@ -7,7 +7,7 @@ from asyncpg import UniqueViolationError
 from config import logger
 from src.api.grpc.protobufs.profiles import profiles_pb2, profiles_pb2_grpc
 from src.repositories.profiles import ProfilesRepository
-from src.schemas.profile import UpdateProfileSchema, CreateProfileSchema, GenderEnum
+from src.schemas.profile import UpdateProfileSchema, CreateProfileSchema
 from src.specifications.equals import EqualsSpecification
 from src.storage.minio import minio_instance
 from src.storage.postgres import database
@@ -189,6 +189,9 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             language_locale=profile.language_locale,
             created_at=profile.created_at.isoformat(),
             updated_at=profile.updated_at.isoformat(),
+            image_base64_list=profile.image_names,
+            lat=profile.lat,
+            lon=profile.lon,
         )
 
     async def Update(
