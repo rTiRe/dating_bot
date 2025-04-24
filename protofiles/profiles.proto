@@ -84,7 +84,7 @@ message ProfilesGetResponse {
     string language_locale = 8;
     string created_at = 9;
     string updated_at = 10;
-    repeated string image_base64_list = 11;
+    repeated string image_names = 11;
     float lat = 12;
     float lon = 13;
 }
