@@ -112,7 +112,26 @@ class ProfilesRepository(BaseRepository):
                 length=len(img_data),
                 content_type="image/jpeg",
             )
-            files_names.append(f"'{filename}'")
+            files_names.append(filename)
         statement = f'update dating.profiles set image_names = ARRAY[??] where id = ??'
         statement = await Specification.to_asyncpg_query(f'{statement};')
         return await connection.execute(statement, ", ".join(files_names), profile_id)
+
+    @staticmethod
+    async def download_image(
+        minio: MinIOConnection,
+        image_name: str,
+    ) -> str | None:
+        response = None
+        image_base64 = None
+        try:
+            response = minio.client.get_object(
+                bucket_name=minio.bucket,
+                object_name=image_name
+            )
+        finally:
+            if response:
+                image_base64 = base64.b64encode(response.data).decode()
+                response.close()
+                response.release_conn()
+        return image_base64

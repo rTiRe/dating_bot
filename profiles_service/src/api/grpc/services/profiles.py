@@ -174,6 +174,7 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             if len(profiles) == 0:
                 await context.abort(grpc.StatusCode.NOT_FOUND)
             profile = profiles[0]
+        image_base64_list = [await ProfilesRepository.download_image(minio_instance, image_name) for image_name in profile.image_names]
         return profiles_pb2.ProfilesGetResponse(
             id=str(profile.id),
             account_id=str(profile.account_id),
@@ -185,7 +186,7 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             language_locale=profile.language_locale,
             created_at=profile.created_at.isoformat(),
             updated_at=profile.updated_at.isoformat(),
-            image_base64_list=profile.image_names,
+            image_base64_list=image_base64_list,
             lat=profile.lat,
             lon=profile.lon,
         )
