@@ -1,15 +1,18 @@
+import base64
 from uuid import UUID
 
 import grpc
 from asyncpg import UniqueViolationError
 
-from config.logger import logger
+from config import logger
 from src.api.grpc.protobufs.profiles import profiles_pb2, profiles_pb2_grpc
 from src.repositories.profiles import ProfilesRepository
 from src.schemas.profile import UpdateProfileSchema, CreateProfileSchema, GenderEnum
 from src.specifications.equals import EqualsSpecification
+from src.storage.minio import minio_instance
 from src.storage.postgres import database
 
+logger = logger(__name__)
 
 class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
     @staticmethod
@@ -70,6 +73,22 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
         if len(lang) > 2:
             raise ValueError('The language code must conform to the ISO 639-1 format (two-character code)')
 
+    @staticmethod
+    async def __check_image_base64_list(images: list[str]):
+        if not images:
+            raise ValueError('There must be 1-3 pictures')
+        # if len > 3
+        for idx, image_str in enumerate(images):
+            try:
+                base64.b64decode(image_str)
+            except ValueError:
+                raise ValueError(f'The image {idx} string must be valid base64')
+
+    @staticmethod
+    async def __check_coordinates(coordinate: float):
+        if not coordinate:
+            raise ValueError('The coordinates fields must be set')
+
     name_to_checker = {
         'id': __check_id,
         'account_id': __check_id,
@@ -79,6 +98,9 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
         'gender': __check_gender,
         'biography': __check_text,
         'language_locale': __check_language,
+        'image_base64_list': __check_image_base64_list,
+        'lat': __check_coordinates,
+        'lon': __check_coordinates,
     }
 
 
@@ -100,12 +122,25 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             gender=request.gender,
             biography=request.biography,
             language_locale=request.language_locale,
+            lat=request.lat,
+            lon=request.lon,
         )
         async with database.pool.acquire() as connection:
             try:
                 profile = await ProfilesRepository.create(connection, create_schema)
             except UniqueViolationError:
                 await context.abort(grpc.StatusCode.ALREADY_EXISTS)
+            try:
+                resp = await ProfilesRepository.upload_images(
+                    connection,
+                    minio_instance,
+                    list(request.image_base64_list),
+                    profile.id,
+                )
+                print(resp, flush=True)
+            except Exception as exception:
+                logger.exception(exception)
+                await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
         return profiles_pb2.ProfileCreateResponse(
             id=str(profile.id),
             account_id=str(profile.account_id),
@@ -117,6 +152,8 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             language_locale=request.language_locale,
             created_at=profile.created_at.isoformat(),
             updated_at=profile.updated_at.isoformat(),
+            lat=profile.lat,
+            lon=profile.lon,
         )
 
 
