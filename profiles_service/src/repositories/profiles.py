@@ -5,9 +5,10 @@ from uuid import UUID
 
 from asyncpg import Record
 from asyncpg.connection import Connection
+from minio.deleteobjects import DeleteObject
 from pydantic import BaseModel
 
-from src.exceptions import UpdateAllRowsException
+from src.exceptions import UpdateAllRowsException, ImageDeletionError
 from src.repositories.base import BaseRepository
 from src.schemas.profile import CreateProfileSchema, ProfileSchema, UpdateProfileSchema
 from src.specifications.base import Specification
@@ -136,8 +137,20 @@ class ProfilesRepository(BaseRepository):
                 response.release_conn()
         return image_base64
 
-    # @staticmethod
-    # async def delete_images(
-    #     minio: MinIOConnection,
-    #     profile_id: str,
-    # ) -> bool:
+    @staticmethod
+    async def delete_images(
+        minio: MinIOConnection,
+        profile_id: str,
+    ) -> bool:
+        images_list = map(
+            lambda img: DeleteObject(img.object_name),
+            minio.client.list_objects(
+                bucket_name=minio.bucket,
+                prefix=profile_id
+            )
+        )
+        errors = minio.client.remove_objects(bucket_name=minio.bucket, delete_object_list=images_list)
+        if errors:
+            for error in errors:
+                raise ImageDeletionError(f'{error.name}: {error.message}')
+        return True
