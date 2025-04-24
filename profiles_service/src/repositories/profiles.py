@@ -1,3 +1,8 @@
+import base64
+import io
+import time
+from uuid import UUID
+
 from asyncpg import Record
 from asyncpg.connection import Connection
 from pydantic import BaseModel
@@ -6,6 +11,7 @@ from src.exceptions import UpdateAllRowsException
 from src.repositories.base import BaseRepository
 from src.schemas.profile import CreateProfileSchema, ProfileSchema, UpdateProfileSchema
 from src.specifications.base import Specification
+from src.storage.minio import MinIOConnection
 
 
 class ProfilesRepository(BaseRepository):
@@ -83,3 +89,30 @@ class ProfilesRepository(BaseRepository):
             *specifications,
             delete_all=delete_all,
         )
+
+    @staticmethod
+    async def upload_images(
+        connection: Connection,
+        minio: MinIOConnection,
+        images: list[str],
+        profile_id: UUID,
+    ):
+        files_names = []
+        for idx, img_b64 in enumerate(images):
+            try:
+                img_data = base64.b64decode(img_b64)
+            except ValueError:
+                raise ValueError(f'Invalid base64 for image {idx}')
+            timestamp = int(time.time()*1000)
+            filename = f'{profile_id}_{timestamp}_{idx}.jpg'
+            minio.client.put_object(
+                bucket_name=minio.bucket,
+                object_name=filename,
+                data=io.BytesIO(img_data),
+                length=len(img_data),
+                content_type="image/jpeg",
+            )
+            files_names.append(f"'{filename}'")
+        statement = f'update dating.profiles set image_names = ARRAY[??] where id = ??'
+        statement = await Specification.to_asyncpg_query(f'{statement};')
+        return await connection.execute(statement, ", ".join(files_names), profile_id)
