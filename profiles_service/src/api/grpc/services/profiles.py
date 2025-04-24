@@ -75,9 +75,6 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
 
     @staticmethod
     async def __check_image_base64_list(images: list[str]):
-        if not images:
-            raise ValueError('There must be 1-3 pictures')
-        # if len > 3
         for idx, image_str in enumerate(images):
             try:
                 base64.b64decode(image_str)
@@ -131,13 +128,12 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             except UniqueViolationError:
                 await context.abort(grpc.StatusCode.ALREADY_EXISTS)
             try:
-                resp = await ProfilesRepository.upload_images(
+                await ProfilesRepository.upload_images(
                     connection,
                     minio_instance,
                     list(request.image_base64_list),
                     profile.id,
                 )
-                print(resp, flush=True)
             except Exception as exception:
                 logger.exception(exception)
                 await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
@@ -223,6 +219,17 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
                     grpc.StatusCode.ALREADY_EXISTS,
                     'An account with this telegram_id field already exists',
                 )
+            if update_data.get('image_base64_list'):
+                try:
+                    update_result = await ProfilesRepository.upload_images(
+                        connection,
+                        minio_instance,
+                        update_data['image_base64_list'],
+                        UUID(request.id),
+                    )
+                except Exception as exception:
+                    logger.exception(exception)
+                    await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
         return profiles_pb2.ProfilesUpdateResponse(result=update_result)
 
     async def Delete(
