@@ -222,6 +222,7 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
                 )
             if update_data.get('image_base64_list'):
                 try:
+                    await ProfilesRepository.delete_images(minio_instance, request.id)
                     update_result = await ProfilesRepository.upload_images(
                         connection,
                         minio_instance,
@@ -245,4 +246,5 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
         delete_specification = EqualsSpecification('id', request.id)
         async with database.pool.acquire() as connection:
             delete_result = await ProfilesRepository.delete(connection, delete_specification)
+        await ProfilesRepository.delete_images(minio_instance, request.id)
         return profiles_pb2.ProfilesDeleteResponse(result=delete_result)
