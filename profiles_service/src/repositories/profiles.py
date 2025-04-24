@@ -129,7 +129,6 @@ class ProfilesRepository(BaseRepository):
                 bucket_name=minio.bucket,
                 object_name=image_name
             )
-
         finally:
             if response:
                 image_base64 = base64.b64encode(response.data).decode()
