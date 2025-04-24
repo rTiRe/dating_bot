@@ -67,6 +67,7 @@ message ProfileCreateResponse {
     repeated string image_base64_list = 10;
     float lat = 11;
     float lon = 12;
+    int32 rating = 13;
 }
 
 
@@ -83,6 +84,7 @@ message ProfilesGetResponse {
     repeated string image_base64_list = 10;
     float lat = 11;
     float lon = 12;
+    int32 rating = 13;
 }
 
 
