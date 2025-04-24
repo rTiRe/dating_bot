@@ -1,7 +1,7 @@
 from aiogram import F, types
 from aiogram.fsm.context import FSMContext
 
-from src.handlers.profile.create.router import router
+from src.handlers.profile.create_and_full_update.router import router
 from src.states import ProfileCreationStates
 from src.handlers.menu import menu
 from src.api.grpc.connections import profiles_connection
@@ -24,16 +24,19 @@ async def create(
         coordinates = user_location
     else:
         coordinates = data.get('city_location')
-    await profiles_connection.create(
-        account_id=data.get('account_id'),
-        first_name=data.get('name'),
-        last_name='',
-        age=data.get('age'),
-        gender=data.get('sex'),
-        biography=data.get('description'),
-        image_base64_list=list(data.get('photos').values()),
-        coordinates=coordinates,
-    )
+    method_data = {
+        'account_id': data.get('account_id'),
+        'name': data.get('name'),
+        'age': data.get('age'),
+        'gender': data.get('gender'),
+        'biography': data.get('description'),
+        'image_base64_list': list(data.get('photos').values()),
+        'coordinates': coordinates,
+    }
+    if data.get('profile_id') is None:
+        await profiles_connection.create(**method_data)
+    else:
+        await profiles_connection.update(id=data.get('profile_id'), **method_data)
     return await menu(message, state)
 
 

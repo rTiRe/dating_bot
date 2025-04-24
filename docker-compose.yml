@@ -144,6 +144,8 @@ services:
         condition: service_healthy
       accounts_service:
         condition: service_started
+      profiles_service:
+        condition: service_started
     env_file:
       - bot_service/config/.env
     volumes:

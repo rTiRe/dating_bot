@@ -8,10 +8,10 @@ from aiogram.fsm.state import default_state
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from grpc import RpcError, StatusCode
 
-from src.handlers.profile.create.router import router
+from src.handlers.profile.create_and_full_update.router import router
 from src.templates import render
 from src.states import MainStates
-from src.handlers.profile.create.name import name
+from src.handlers.profile.create_and_full_update.name import name
 from src.api.grpc.connections import accounts_connection, profiles_connection
 from config import logger
 
@@ -39,13 +39,15 @@ async def menu(
             raise exception
     if not profile_data:
         return await name(message, state)
+    else:
+        await state.update_data(profile_id=profile_data.id)
     introduce_message = await message.answer(
         'Так выглядит твоя анкета:',
         reply_markup=ReplyKeyboardRemove(),
     )
     caption = await render(
         'profile/profile',
-        name=profile_data.first_name,
+        name=profile_data.name,
         age=profile_data.age,
         # city_location=profile_data['city_location'],
         # user_location=profile_data['user_location'],
@@ -53,14 +55,14 @@ async def menu(
     )
     if len(profile_data.image_base64_list) == 1:
         profile_message = await message.answer_photo(
-            photo=b64decode(profile_data.image_base64_list[0]),
+            photo=types.BufferedInputFile(b64decode(profile_data.image_base64_list[0]), f'{account_id}_0'),
             caption=caption,
         )
     else:
         media_group = MediaGroupBuilder(caption=caption)
         for num, photo_base64 in enumerate(profile_data.image_base64_list):
             media_group.add_photo(
-                types.BufferedInputFile(b64decode(photo_base64), f'{account_id}_{int(time() * 100)}_{num}'),
+                types.BufferedInputFile(b64decode(photo_base64), f'{account_id}_{num}'),
             )
         profile_message = await message.answer_media_group(media=media_group.build())
     menu_message = await message.answer(

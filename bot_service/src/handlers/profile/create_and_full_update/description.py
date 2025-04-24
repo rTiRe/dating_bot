@@ -2,7 +2,7 @@ from aiogram import F, types
 from aiogram.fsm.context import FSMContext
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
-from src.handlers.profile.create.router import router
+from src.handlers.profile.create_and_full_update.router import router
 from src.templates import render
 from src.states import ProfileCreationStates
 
@@ -15,9 +15,12 @@ async def description(message: types.Message, state: FSMContext) -> types.Messag
         sex_preference = 'F'
     else:
         sex_preference = 'N'
-    await state.update_data(sex_preference=sex_preference)
+        await state.update_data(sex_preference=sex_preference)
     bot_message = await message.answer(
-        await render('profile/create/7_description'),
+        await render(
+            'profile/create/7_description',
+            first_meet=(await state.get_data()).get('profile_id') is None,
+        ),
         reply_markup=ReplyKeyboardMarkup(
             keyboard=[
                 [KeyboardButton(text='Пропустить')],

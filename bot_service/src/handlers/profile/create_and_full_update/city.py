@@ -4,7 +4,7 @@ from aiogram import F, types
 from aiogram.fsm.context import FSMContext
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
-from src.handlers.profile.create.router import router
+from src.handlers.profile.create_and_full_update.router import router
 from src.templates import render
 from src.states import ProfileCreationStates
 

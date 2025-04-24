@@ -204,18 +204,19 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
         specification = EqualsSpecification('id', request.id)
         update_schema = UpdateProfileSchema(**update_data)
         async with database.pool.acquire() as connection:
-            try:
-                update_result = await ProfilesRepository.update(
-                    connection,
-                    specification,
-                    update_data=update_schema,
-                )
-            except UniqueViolationError as exception:
-                logger.error(exception)
-                await context.abort(
-                    grpc.StatusCode.ALREADY_EXISTS,
-                    'An account with this telegram_id field already exists',
-                )
+            if any(update_schema.model_dump().values()):
+                try:
+                    update_result = await ProfilesRepository.update(
+                        connection,
+                        specification,
+                        update_data=update_schema,
+                    )
+                except UniqueViolationError as exception:
+                    logger.error(exception)
+                    await context.abort(
+                        grpc.StatusCode.ALREADY_EXISTS,
+                        'An account with this telegram_id field already exists',
+                    )
             if update_data.get('image_base64_list'):
                 try:
                     await ProfilesRepository.delete_images(minio_instance, request.id)

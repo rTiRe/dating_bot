@@ -3,7 +3,7 @@ from aiogram.fsm.state import StatesGroup, State
 class ProfileCreationStates(StatesGroup):
     name = State()
     age = State()
-    sex = State()
+    gender = State()
     photo = State()
     city = State()
     sex_preferences = State()

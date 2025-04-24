@@ -19,8 +19,7 @@ class ProfilesConnection(BaseConnection):
     async def create(
         self,
         account_id: UUID | str,
-        first_name: str,
-        last_name: str,
+        name: str,
         age: int,
         gender: profiles_pb2.Gender | int,
         biography: str,
@@ -30,20 +29,9 @@ class ProfilesConnection(BaseConnection):
     ) -> profiles_pb2.ProfileCreateResponse:
         if not isinstance(account_id, UUID):
             account_id = UUID(account_id)  # noqa: WPS125
-        print(type(account_id), flush=True)
-        print(type(first_name), flush=True)
-        print(type(last_name), flush=True)
-        print(type(age), flush=True)
-        print(type(gender), flush=True)
-        print(type(biography), flush=True)
-        print(type(language_locale), flush=True)
-        print(type(image_base64_list), flush=True)
-        print(type(coordinates['lat']), flush=True)
-        print(type(coordinates['lon']), flush=True)
         profile_request = profiles_pb2.ProfileCreateRequest(
             account_id=str(account_id),
-            first_name=first_name,
-            last_name=last_name,
+            name=name,
             age=age,
             gender=gender,
             biography=biography,
@@ -53,7 +41,39 @@ class ProfilesConnection(BaseConnection):
             lon=coordinates['lon'],
         )
         return self.stub.Create(profile_request)
-    
+
+    async def update(
+        self,
+        id: UUID | str,
+        account_id: UUID | str | None = None,
+        name: str | None = None,
+        age: int | None = None,
+        gender: profiles_pb2.Gender | int | None = None,
+        biography: str | None = None,
+        image_base64_list: list[str] | None = None,
+        coordinates: dict[str, float] = {},
+        language_locale: str | None = None,
+    ) -> profiles_pb2.ProfilesUpdateResponse:
+        if not isinstance(id, UUID):
+            id = UUID(id)  # noqa: WPS125
+        if account_id and not isinstance(account_id, UUID):
+            account_id = str(UUID(account_id))  # noqa: WPS125
+        profile_request = profiles_pb2.ProfileUpdateRequest(
+            id=str(id),
+            data=profiles_pb2.ProfileUpdateRequest.UpdateData(
+                account_id=account_id,
+                name=name,
+                age=age,
+                gender=gender,
+                biography=biography,
+                language_locale=language_locale,
+                image_base64_list=image_base64_list,
+                lat=coordinates.get('lat'),
+                lon=coordinates.get('lon'),
+            ),
+        )
+        return self.stub.Update(profile_request)
+
     async def get_by_account_id(
         self,
         account_id: UUID | str,
