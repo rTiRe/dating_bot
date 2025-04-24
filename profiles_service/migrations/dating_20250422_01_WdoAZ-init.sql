@@ -13,10 +13,10 @@ create table dating."profiles" (
     age int8,
     gender char(1),
     biography text,
-    additional_info text,
     language_locale varchar(2),
     created_at timestamptz default now(),
-    updated_at timestamptz default now()
+    updated_at timestamptz default now(),
+    image_names text[] not null default ARRAY[]::text[]
 );
 
 create or replace function update_updated_at_column()
