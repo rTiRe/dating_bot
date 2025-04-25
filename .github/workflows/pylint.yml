@@ -1,0 +1,42 @@
+name: Checking
+on: [push]
+jobs:
+  linter_bot_service:
+    name: Bot service linter
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Python installing
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.12.3
+    - name: Installing dependecies
+      run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade poetry==2.1.2
+        cd bot_service
+        poetry install --only linters
+    - name: Flake8
+      run: |
+        cd bot_service
+        poetry run flake8 .
+
+  linter_accounts_service:
+    name: Accounts service linter
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Python installing
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.12.3
+    - name: Installing dependecies
+      run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade poetry==2.1.2
+        cd accounts_service
+        poetry install --only linters
+    - name: Flake8
+      run: |
+        cd accounts_service
+        poetry run flake8 .
