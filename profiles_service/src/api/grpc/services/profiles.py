@@ -119,6 +119,7 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             language_locale=request.language_locale,
             lat=request.lat,
             lon=request.lon,
+            interested_in=request.interested_in
         )
         async with database.pool.acquire() as connection:
             try:
@@ -147,6 +148,7 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             updated_at=profile.updated_at.isoformat(),
             lat=profile.lat,
             lon=profile.lon,
+            rating=profile.rating,
         )
 
 
@@ -185,6 +187,7 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             image_base64_list=image_base64_list,
             lat=profile.lat,
             lon=profile.lon,
+            rating=profile.rating,
         )
 
     async def Update(

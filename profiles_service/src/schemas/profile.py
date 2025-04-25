@@ -33,6 +33,8 @@ class ProfileSchema(BaseModel):
     image_names: list[str]
     lat: float
     lon: float
+    rating: int
+    interested_in: Annotated[GenderEnum | int, AfterValidator(check_gender)]
 
 
 class CreateProfileSchema(BaseModel):
@@ -44,6 +46,7 @@ class CreateProfileSchema(BaseModel):
     language_locale: str
     lat: float
     lon: float
+    interested_in: Annotated[GenderEnum | int, AfterValidator(check_gender)]
 
 
 class UpdateProfileSchema(BaseModel):
@@ -55,3 +58,4 @@ class UpdateProfileSchema(BaseModel):
     language_locale: str | None = None
     lat: float | None = None
     lon: float | None = None
+    interested_in: Annotated[GenderEnum | int, AfterValidator(check_gender)] | None = None
