@@ -67,7 +67,7 @@ services:
   accounts_service:
     build: ./accounts_service
     container_name: accounts_service
-    command: ash -c "poetry run yoyo apply -b && poetry run python -m src"
+    command: bash -c "poetry run yoyo apply -b && poetry run python -m src"
     stop_signal: SIGINT
     restart: unless-stopped
     depends_on:
