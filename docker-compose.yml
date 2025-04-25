@@ -26,8 +26,8 @@ services:
       MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
       MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
     ports:
-      - "9000:9000"   # API
-      - "9001:9001"   # web console
+      - "9000:9000" # API
+      - "9001:9001" # web console
     command: server /data --console-address ":9001"
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/ready" ]
@@ -44,15 +44,15 @@ services:
 
   redis:
     image: redis:latest
-    container_name: redis_container
+    container_name: redis
     environment:
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_PASSWORD=${REDIS_PASS}
       - REDIS_USER=${REDIS_USER}
-      - REDIS_USER_PASSWORD=${REDIS_USER_PASSWORD}
+      - REDIS_USER_PASSWORD=${REDIS_USER_PASS}
     ports:
       - "6380:6379"
     volumes:
-      - ./redisdata:/data
+      - redis_data:/data
     deploy:
       resources:
         limits:
@@ -65,21 +65,43 @@ services:
       sh -c '
         mkdir -p /usr/local/etc/redis &&
         echo "bind 0.0.0.0" > /usr/local/etc/redis/redis.conf &&
-        echo "requirepass $REDIS_PASSWORD" >> /usr/local/etc/redis/redis.conf &&
+        echo "requirepass $REDIS_PASS" >> /usr/local/etc/redis/redis.conf &&
         echo "appendonly yes" >> /usr/local/etc/redis/redis.conf &&
         echo "appendfsync everysec" >> /usr/local/etc/redis/redis.conf &&
         echo "user default on nopass ~* +@all" > /usr/local/etc/redis/users.acl &&
-        echo "user $REDIS_USER on >$REDIS_USER_PASSWORD ~* +@all" >> /usr/local/etc/redis/users.acl &&
+        echo "user $REDIS_USER on >$REDIS_USER_PASS ~* +@all" >> /usr/local/etc/redis/users.acl &&
         redis-server /usr/local/etc/redis/redis.conf --aclfile /usr/local/etc/redis/users.acl
       '
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "$REDIS_PASSWORD", "ping"]
+      test: [ "CMD", "redis-cli", "-a", "$REDIS_PASS", "ping" ]
       interval: 30s
       timeout: 10s
       retries: 5
     restart: unless-stopped
     tty: true
     stdin_open: true
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.0.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - ELASTIC_PASSWORD=${ELASTICSEARCH_PASS}
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - cluster.name=docker-cluster
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - recommendations_network
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -s http://localhost:9200 >/dev/null || exit 1" ]
+      interval: 30s
+      timeout: 30s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
 
   accounts_db:
     image: 'postgres:15.5'
@@ -149,7 +171,7 @@ services:
     container_name: profiles_service
     command: bash -c "poetry run yoyo apply -b && poetry run python -m src"
     stop_signal: SIGINT
-    restart: no
+    restart: unless-stopped
     depends_on:
       profiles_db:
         condition: service_healthy
@@ -171,6 +193,23 @@ services:
       - profiles_network
       - external_network
 
+  recommendations_service:
+    build: ./recommendations_service
+    container_name: recommendations_service
+    command: bash -c "poetry run python -m src"
+    ports:
+      - "8012:1337"
+    stop_signal: SIGINT
+    restart: unless-stopped
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    volumes:
+      - ./recommendations_service:/usr/src/dating/recommendations_service
+    networks:
+      - recommendations_network
+      - external_network
+
   bot_service:
     build: ./bot_service
     container_name: bot_service
@@ -183,6 +222,8 @@ services:
       accounts_service:
         condition: service_started
       profiles_service:
+        condition: service_started
+      recommendations_service:
         condition: service_started
     env_file:
       - bot_service/config/.env
@@ -199,6 +240,8 @@ networks:
     driver: bridge
   profiles_network:
     driver: bridge
+  recommendations_network:
+    driver: bridge
   external_network:
     driver: bridge
 
@@ -207,3 +250,5 @@ volumes:
   profiles_pgdata:
   rabbitmq_data:
   minio_data:
+  elasticsearch_data:
+  redis_data:

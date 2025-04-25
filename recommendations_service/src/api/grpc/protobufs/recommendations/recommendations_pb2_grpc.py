@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-import elastic_pb2 as elastic__pb2
+from . import recommendations_pb2 as recommendations__pb2
 
 GRPC_GENERATED_VERSION = '1.71.0'
 GRPC_VERSION = grpc.__version__
@@ -18,14 +18,14 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + f' but the generated code in elastic_pb2_grpc.py depends on'
+        + f' but the generated code in recommendations_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
     )
 
 
-class ElasticSearchStub(object):
+class RecommendationsServiceStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -34,22 +34,22 @@ class ElasticSearchStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.GetMatch = channel.unary_unary(
-                '/elastic.ElasticSearch/GetMatch',
-                request_serializer=elastic__pb2.GetMatchRequest.SerializeToString,
-                response_deserializer=elastic__pb2.GetMatchResponse.FromString,
+        self.GetMatches = channel.unary_unary(
+                '/dating.service.recommendations.RecommendationsService/GetMatches',
+                request_serializer=recommendations__pb2.RecommendationsGetMatchRequest.SerializeToString,
+                response_deserializer=recommendations__pb2.RecommendationsGetMatchResponse.FromString,
                 _registered_method=True)
         self.UpdateUser = channel.unary_unary(
-                '/elastic.ElasticSearch/UpdateUser',
-                request_serializer=elastic__pb2.UpdateUserRequest.SerializeToString,
-                response_deserializer=elastic__pb2.UpdateUserResponse.FromString,
+                '/dating.service.recommendations.RecommendationsService/UpdateUser',
+                request_serializer=recommendations__pb2.RecommendationsUpdateUserRequest.SerializeToString,
+                response_deserializer=recommendations__pb2.RecommendationsUpdateUserResponse.FromString,
                 _registered_method=True)
 
 
-class ElasticSearchServicer(object):
+class RecommendationsServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def GetMatch(self, request, context):
+    def GetMatches(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -62,31 +62,31 @@ class ElasticSearchServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
-def add_ElasticSearchServicer_to_server(servicer, server):
+def add_RecommendationsServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'GetMatch': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetMatch,
-                    request_deserializer=elastic__pb2.GetMatchRequest.FromString,
-                    response_serializer=elastic__pb2.GetMatchResponse.SerializeToString,
+            'GetMatches': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetMatches,
+                    request_deserializer=recommendations__pb2.RecommendationsGetMatchRequest.FromString,
+                    response_serializer=recommendations__pb2.RecommendationsGetMatchResponse.SerializeToString,
             ),
             'UpdateUser': grpc.unary_unary_rpc_method_handler(
                     servicer.UpdateUser,
-                    request_deserializer=elastic__pb2.UpdateUserRequest.FromString,
-                    response_serializer=elastic__pb2.UpdateUserResponse.SerializeToString,
+                    request_deserializer=recommendations__pb2.RecommendationsUpdateUserRequest.FromString,
+                    response_serializer=recommendations__pb2.RecommendationsUpdateUserResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'elastic.ElasticSearch', rpc_method_handlers)
+            'dating.service.recommendations.RecommendationsService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('elastic.ElasticSearch', rpc_method_handlers)
+    server.add_registered_method_handlers('dating.service.recommendations.RecommendationsService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
-class ElasticSearch(object):
+class RecommendationsService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def GetMatch(request,
+    def GetMatches(request,
             target,
             options=(),
             channel_credentials=None,
@@ -99,9 +99,9 @@ class ElasticSearch(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/elastic.ElasticSearch/GetMatch',
-            elastic__pb2.GetMatchRequest.SerializeToString,
-            elastic__pb2.GetMatchResponse.FromString,
+            '/dating.service.recommendations.RecommendationsService/GetMatches',
+            recommendations__pb2.RecommendationsGetMatchRequest.SerializeToString,
+            recommendations__pb2.RecommendationsGetMatchResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -126,9 +126,9 @@ class ElasticSearch(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/elastic.ElasticSearch/UpdateUser',
-            elastic__pb2.UpdateUserRequest.SerializeToString,
-            elastic__pb2.UpdateUserResponse.FromString,
+            '/dating.service.recommendations.RecommendationsService/UpdateUser',
+            recommendations__pb2.RecommendationsUpdateUserRequest.SerializeToString,
+            recommendations__pb2.RecommendationsUpdateUserResponse.FromString,
             options,
             channel_credentials,
             insecure,

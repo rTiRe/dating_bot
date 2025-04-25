@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package dating.service.recommendations;
+
+import "profiles.proto";
+
+service RecommendationsService {
+    rpc GetMatches(RecommendationsGetMatchRequest) returns (RecommendationsGetMatchResponse);
+    rpc UpdateUser(RecommendationsUpdateUserRequest) returns (RecommendationsUpdateUserResponse);
+}
+
+message RecommendationsGetMatchRequest {
+    float lat = 1;
+    float lon = 2;
+    profiles.Gender gender = 3;
+    int32 age_min = 4;
+    int32 age_max = 5;
+    int32 distance = 6;
+    int32 limit = 7;
+}
+
+message RecommendationsGetMatchResponse {
+    repeated string user_ids = 1;
+    int32 total = 2;
+}
+
+message RecommendationsUpdateUserRequest {
+    string user_id = 1;
+    float lat = 2;
+    float lon = 3;
+    int32 age = 4;
+    string gender = 5;
+}
+
+message RecommendationsUpdateUserResponse {
+    string user_id = 1;
+    bool created = 2;
+}
