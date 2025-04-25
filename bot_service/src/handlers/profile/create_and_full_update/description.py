@@ -6,16 +6,16 @@ from src.handlers.profile.create_and_full_update.router import router
 from src.templates import render
 from src.states import ProfileCreationStates
 
-@router.message(ProfileCreationStates.sex_preferences, F.text.lower().in_(['парни', 'девушки', 'все равно']))
+@router.message(ProfileCreationStates.interested_in, F.text.lower().in_(['парни', 'девушки', 'все равно']))
 async def description(message: types.Message, state: FSMContext) -> types.Message:
-    preference_text = message.text.lower()
-    if preference_text == 'парни':
-        sex_preference = 'M'
-    elif preference_text == 'девушки':
-        sex_preference = 'F'
+    interested_in_text = message.text.lower()
+    if interested_in_text == 'парни':
+        interested_in = 'M'
+    elif interested_in_text == 'девушки':
+        interested_in = 'F'
     else:
-        sex_preference = 'N'
-        await state.update_data(sex_preference=sex_preference)
+        interested_in = 'N'
+        await state.update_data(interested_in=interested_in)
     bot_message = await message.answer(
         await render(
             'profile/create/7_description',
@@ -35,6 +35,6 @@ async def description(message: types.Message, state: FSMContext) -> types.Messag
     return bot_message
 
 
-@router.message(ProfileCreationStates.sex_preferences)
+@router.message(ProfileCreationStates.interested_in)
 async def description_error(message: types.Message) -> types.Message:
     return await message.answer('Я тебя не понял. Используй кнопки на клавиатуре')

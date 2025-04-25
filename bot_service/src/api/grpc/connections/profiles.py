@@ -25,6 +25,7 @@ class ProfilesConnection(BaseConnection):
         biography: str,
         image_base64_list: list[str],
         coordinates: dict[str, float],
+        interested_in: profiles_pb2.Gender | int,
         language_locale: str = 'ru',
     ) -> profiles_pb2.ProfileCreateResponse:
         if not isinstance(account_id, UUID):
@@ -39,6 +40,7 @@ class ProfilesConnection(BaseConnection):
             image_base64_list=image_base64_list,
             lat=coordinates['lat'],
             lon=coordinates['lon'],
+            interested_in=interested_in,
         )
         return self.stub.Create(profile_request)
 
@@ -52,6 +54,7 @@ class ProfilesConnection(BaseConnection):
         biography: str | None = None,
         image_base64_list: list[str] | None = None,
         coordinates: dict[str, float] = {},
+        interested_in: profiles_pb2.Gender | int | None = None,
         language_locale: str | None = None,
     ) -> profiles_pb2.ProfilesUpdateResponse:
         if not isinstance(id, UUID):
@@ -70,6 +73,7 @@ class ProfilesConnection(BaseConnection):
                 image_base64_list=image_base64_list,
                 lat=coordinates.get('lat'),
                 lon=coordinates.get('lon'),
+                interested_in=interested_in,
             ),
         )
         return self.stub.Update(profile_request)

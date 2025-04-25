@@ -32,6 +32,7 @@ async def create(
         'biography': data.get('description'),
         'image_base64_list': list(data.get('photos').values()),
         'coordinates': coordinates,
+        'interested_in': data.get('interested_in')
     }
     if data.get('profile_id') is None:
         await profiles_connection.create(**method_data)

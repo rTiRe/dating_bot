@@ -10,7 +10,7 @@ from src.states import ProfileCreationStates
 geolocator = Nominatim(user_agent='dating_bot')
 
 @router.message(ProfileCreationStates.city, F.text | F.location)
-async def sex_preferences(message: types.Message, state: FSMContext) -> types.Message:
+async def interested_in(message: types.Message, state: FSMContext) -> types.Message:
     city_location = {}
     user_location = {}
     if message.text:
@@ -29,7 +29,7 @@ async def sex_preferences(message: types.Message, state: FSMContext) -> types.Me
         }
     await state.update_data(city_location=city_location, user_location=user_location)
     bot_message = await message.answer(
-        await render('profile/create/6_sex_preferences'),
+        await render('profile/create/6_interested_in'),
         reply_markup=ReplyKeyboardMarkup(
             keyboard=[
                 [
@@ -44,10 +44,10 @@ async def sex_preferences(message: types.Message, state: FSMContext) -> types.Me
             input_field_placeholder='Я ищу...',
         ),
     )
-    await state.set_state(ProfileCreationStates.sex_preferences)
+    await state.set_state(ProfileCreationStates.interested_in)
     return bot_message
 
 
 @router.message(ProfileCreationStates.city)
-async def sex_preferences_error(message: types.Message) -> types.Message:
+async def interested_in_error(message: types.Message) -> types.Message:
     return await message.answer('Мне нужно название города или геопозиция')

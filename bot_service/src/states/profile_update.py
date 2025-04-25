@@ -6,6 +6,6 @@ class ProfileUpdateStates(StatesGroup):
     gender = State()
     photo = State()
     city = State()
-    sex_preferences = State()
+    interested_in = State()
     description = State()
     check = State()
