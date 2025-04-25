@@ -21,6 +21,7 @@ message ProfileCreateRequest {
     repeated string image_base64_list = 7;
     float lat = 8;
     float lon = 9;
+    Gender interested_in = 10;
 }
 
 
@@ -43,6 +44,7 @@ message ProfileUpdateRequest {
         repeated string image_base64_list = 7;
         optional float lat = 8;
         optional float lon = 9;
+        optional Gender interested_in = 10;
     }
     string id = 1;
     UpdateData data = 2;
@@ -67,6 +69,8 @@ message ProfileCreateResponse {
     repeated string image_base64_list = 10;
     float lat = 11;
     float lon = 12;
+    int32 rating = 13;
+    Gender interested_in = 14;
 }
 
 
@@ -83,6 +87,8 @@ message ProfilesGetResponse {
     repeated string image_base64_list = 10;
     float lat = 11;
     float lon = 12;
+    int32 rating = 13;
+    Gender interested_in = 14;
 }
 
 
