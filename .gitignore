@@ -5,6 +5,8 @@
 
 # production
 /build
+*venv*
+*cache*
 
 # misc
 .DS_Store

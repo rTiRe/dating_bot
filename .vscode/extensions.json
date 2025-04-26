@@ -1,0 +1,9 @@
+{
+    "recommendations": [
+        "vscode-proto3",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "gruntfuggly.todo-tree",
+        "eamodio.gitlens"
+    ]
+} 
