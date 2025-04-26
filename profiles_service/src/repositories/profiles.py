@@ -23,6 +23,7 @@ class ProfilesRepository(BaseRepository):
     ) -> ProfileSchema:
         data_dict = create_data.model_dump()
         data_dict['gender'] = str(data_dict['gender'].value)
+        data_dict['interested_in'] = str(data_dict['interested_in'].value)
         statement_values = []
         columns = ', '.join([column for column in data_dict.keys()])
         values_pattern = ', '.join('??' for _ in range(len(data_dict)))
@@ -66,6 +67,8 @@ class ProfilesRepository(BaseRepository):
         update_values = update_data.model_dump(exclude_unset=True)
         if update_values.get('gender'):
             update_values['gender'] = str(update_values['gender'].value)
+        if update_values.get('interested_in'):
+            update_values['interested_in'] = str(update_values['interested_in'].value)
         set_statement = ', '.join([f'{column} = ??' for column in update_values.keys()])
         statement_values = list(update_values.values())
         statement = f'update dating.profiles set {set_statement}'

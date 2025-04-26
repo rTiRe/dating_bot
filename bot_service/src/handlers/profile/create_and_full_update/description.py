@@ -5,17 +5,18 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from src.handlers.profile.create_and_full_update.router import router
 from src.templates import render
 from src.states import ProfileCreationStates
+from src.api.grpc.protobufs import profiles_pb2
 
 @router.message(ProfileCreationStates.interested_in, F.text.lower().in_(['парни', 'девушки', 'все равно']))
 async def description(message: types.Message, state: FSMContext) -> types.Message:
     interested_in_text = message.text.lower()
     if interested_in_text == 'парни':
-        interested_in = 'M'
+        interested_in = profiles_pb2.Gender.GENDER_MALE
     elif interested_in_text == 'девушки':
-        interested_in = 'F'
+        interested_in = profiles_pb2.Gender.GENDER_FEMALE
     else:
-        interested_in = 'N'
-        await state.update_data(interested_in=interested_in)
+        interested_in = profiles_pb2.Gender.GENDER_DEFAULT
+    await state.update_data(interested_in=interested_in)
     bot_message = await message.answer(
         await render(
             'profile/create/7_description',

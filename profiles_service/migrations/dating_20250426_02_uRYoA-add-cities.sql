@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS dating."cities" (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     lat FLOAT NOT NULL,
     lon FLOAT NOT NULL
-)
+);
 
 CREATE INDEX cities_points_idx ON dating."cities" (lat, lon);
 

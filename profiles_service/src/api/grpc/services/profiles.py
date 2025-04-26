@@ -97,6 +97,7 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
         'image_base64_list': __check_image_base64_list,
         'lat': __check_coordinates,
         'lon': __check_coordinates,
+        'interested_in': __check_gender,
     }
 
 
@@ -188,6 +189,7 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             lat=profile.lat,
             lon=profile.lon,
             rating=profile.rating,
+            interested_in=profile.interested_in.name,
         )
 
     async def Update(
