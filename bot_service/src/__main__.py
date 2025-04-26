@@ -1,3 +1,5 @@
+"""Main module."""
+
 import asyncio
 
 from aiogram import Bot, Dispatcher
@@ -5,27 +7,29 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.types import BotCommand, BotCommandScopeAllPrivateChats
 
-from config import settings, logger
-from src.bot import setup_dispatcher, setup_bot
+from config import logger, settings
+from src.bot import setup_bot, setup_dispatcher
 from src.handlers import router
 from src.storage.rabbit import channel_pool
-
 
 logger = logger(__name__)
 
 
 async def setup_rabbit() -> None:
-    async with channel_pool.acquire() as channel:
-        ...
-        # queue_name = await channel.declare_queue('queue_name', durable=True)
-        # await queue_name.consume(consumer_name)
+    """Set up RabbitMQ."""
+    async with channel_pool.acquire() as channel:  # noqa: F841
+        ...  # noqa: WPS428
 
 
 async def setup_app() -> tuple[Dispatcher, Bot]:
+    """Set up bot app.
+
+    Returns:
+        tuple[Dispatcher, Bot]: bot data.
+    """
     dispatcher = Dispatcher(storage=None)
     setup_dispatcher(dispatcher)
     dispatcher.include_router(router)
-    # dispatcher.message.outer_middleware(ThrottlingMiddleware(limit=2))
     default_properties = DefaultBotProperties(
         parse_mode=ParseMode.HTML,
     )
@@ -33,7 +37,7 @@ async def setup_app() -> tuple[Dispatcher, Bot]:
     await bot.delete_webhook()
     await bot.set_my_commands(
         [
-            BotCommand(command='start', description='Перезапустить бота')
+            BotCommand(command='start', description='Перезапустить бота'),
         ],
         scope=BotCommandScopeAllPrivateChats(),
     )
@@ -43,6 +47,7 @@ async def setup_app() -> tuple[Dispatcher, Bot]:
 
 
 async def start_polling() -> None:
+    """Start bot polling."""
     dispatcher, bot = await setup_app()
     await dispatcher.start_polling(bot)
 

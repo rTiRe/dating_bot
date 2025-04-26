@@ -1,11 +1,16 @@
+"""Module for manage app settings."""
+
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    """App settings."""
+
     BOT_TOKEN: SecretStr
     RABBITMQ_URL: str
     ACCOUNTS_GRPC_URL: str
+    PROFILES_GRPC_URL: str
 
     LOGS_FILE: str = 'logs.log'
 

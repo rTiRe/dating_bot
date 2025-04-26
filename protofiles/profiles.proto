@@ -1,0 +1,109 @@
+syntax = "proto3";
+
+package dating.service.profiles;
+
+
+service ProfilesService {
+    rpc Create(ProfileCreateRequest) returns (ProfileCreateResponse);
+    rpc Get(ProfilesGetRequest) returns (ProfilesGetResponse);
+    rpc Update(ProfileUpdateRequest) returns (ProfilesUpdateResponse);
+    rpc Delete(ProfileDeleteRequest) returns (ProfilesDeleteResponse);
+}
+
+
+message ProfileCreateRequest {
+    string account_id = 1;
+    string name = 2;
+    int32 age = 3;
+    Gender gender = 4;
+    optional string biography = 5;
+    string language_locale = 6;
+    repeated string image_base64_list = 7;
+    float lat = 8;
+    float lon = 9;
+    Gender interested_in = 10;
+}
+
+
+message ProfilesGetRequest {
+    oneof identifier {
+        string id = 1;
+        string account_id = 2;
+    }
+}
+
+
+message ProfileUpdateRequest {
+    message UpdateData {
+        optional string account_id = 1;
+        optional string name = 2;
+        optional int32 age = 3;
+        optional Gender gender = 4;
+        optional string biography = 5;
+        optional string language_locale = 6;
+        repeated string image_base64_list = 7;
+        optional float lat = 8;
+        optional float lon = 9;
+        optional Gender interested_in = 10;
+    }
+    string id = 1;
+    UpdateData data = 2;
+}
+
+
+message ProfileDeleteRequest {
+    string id = 1;
+}
+
+
+message ProfileCreateResponse {
+    string id = 1;
+    string account_id = 2;
+    string name = 3;
+    int32 age = 4;
+    Gender gender = 5;
+    string biography = 6;
+    string language_locale = 7;
+    string created_at = 8;
+    string updated_at = 9;
+    repeated string image_base64_list = 10;
+    float lat = 11;
+    float lon = 12;
+    int32 rating = 13;
+    Gender interested_in = 14;
+}
+
+
+message ProfilesGetResponse {
+    string id = 1;
+    string account_id = 2;
+    string name = 3;
+    int32 age = 4;
+    Gender gender = 5;
+    string biography = 6;
+    string language_locale = 7;
+    string created_at = 8;
+    string updated_at = 9;
+    repeated string image_base64_list = 10;
+    float lat = 11;
+    float lon = 12;
+    int32 rating = 13;
+    Gender interested_in = 14;
+}
+
+
+message ProfilesUpdateResponse {
+    string result = 1;
+}
+
+
+message ProfilesDeleteResponse {
+    string result = 1;
+}
+
+
+enum Gender {
+    GENDER_DEFAULT = 0;
+    GENDER_MALE = 1;
+    GENDER_FEMALE = 2;
+}
