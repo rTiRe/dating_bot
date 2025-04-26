@@ -41,29 +41,19 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
     async def __check_age(age: int) -> None:
         if not age:
             raise ValueError('The age field must be set')
-        try:
-            int(age)
-        except ValueError:
-            raise ValueError('The age field must be of type Integer')
 
     @staticmethod
     async def __check_gender(gender: int) -> None:
         if not gender:
             raise ValueError('The gender field must be set')
-        try:
-            int(gender)
-        except ValueError:
-            raise ValueError('The gender field must be of type Integer')
-        if abs(int(gender)) > 2:
-            raise ValueError('There are only two genders, faggot')
 
     @staticmethod
     async def __check_text(text: str) -> None:
         min_text_length = 0
-        max_text_length = 256
+        max_text_length = 2056
         if text and not (min_text_length <= len(text) <= max_text_length):
             raise ValueError(
-                'The length of the text field value must be from 0 to 256 characters',
+                f'The length of the text field value must be from {min_text_length} to {max_text_length} characters',
             )
 
     @staticmethod

@@ -12,6 +12,7 @@ service ProfilesService {
 
 
 message ProfileCreateRequest {
+    reserved 8, 9;
     string account_id = 1;
     string name = 2;
     int32 age = 3;
@@ -19,9 +20,11 @@ message ProfileCreateRequest {
     optional string biography = 5;
     string language_locale = 6;
     repeated string image_base64_list = 7;
-    float lat = 8;
-    float lon = 9;
     Gender interested_in = 10;
+    oneof coordinates {
+        CityPoint city_point = 11;
+        UserPoint user_point = 12;
+    }
 }
 
 
@@ -35,6 +38,7 @@ message ProfilesGetRequest {
 
 message ProfileUpdateRequest {
     message UpdateData {
+        reserved 8, 9;
         optional string account_id = 1;
         optional string name = 2;
         optional int32 age = 3;
@@ -42,9 +46,11 @@ message ProfileUpdateRequest {
         optional string biography = 5;
         optional string language_locale = 6;
         repeated string image_base64_list = 7;
-        optional float lat = 8;
-        optional float lon = 9;
         optional Gender interested_in = 10;
+        oneof coordinates {
+            CityPoint city_point = 11;
+            UserPoint user_point = 12;
+        }
     }
     string id = 1;
     UpdateData data = 2;
@@ -57,6 +63,7 @@ message ProfileDeleteRequest {
 
 
 message ProfileCreateResponse {
+    reserved 11, 12;
     string id = 1;
     string account_id = 2;
     string name = 3;
@@ -67,14 +74,17 @@ message ProfileCreateResponse {
     string created_at = 8;
     string updated_at = 9;
     repeated string image_base64_list = 10;
-    float lat = 11;
-    float lon = 12;
     int32 rating = 13;
     Gender interested_in = 14;
+    oneof coordinates {
+        CityPoint city_point = 15;
+        UserPoint user_point = 16;
+    }
 }
 
 
 message ProfilesGetResponse {
+    reserved 11, 12;
     string id = 1;
     string account_id = 2;
     string name = 3;
@@ -85,10 +95,12 @@ message ProfilesGetResponse {
     string created_at = 8;
     string updated_at = 9;
     repeated string image_base64_list = 10;
-    float lat = 11;
-    float lon = 12;
     int32 rating = 13;
     Gender interested_in = 14;
+    oneof coordinates {
+        CityPoint city_point = 15;
+        UserPoint user_point = 16;
+    }
 }
 
 
@@ -99,6 +111,19 @@ message ProfilesUpdateResponse {
 
 message ProfilesDeleteResponse {
     string result = 1;
+}
+
+
+message CityPoint {
+    string name = 1;
+    float lan = 2;
+    float lon = 3;
+}
+
+
+message UserPoint {
+    float lan = 1;
+    float lon = 2;
 }
 
 
