@@ -3,7 +3,7 @@ import grpc
 from src.api.grpc.protobufs import recommendations_pb2, recommendations_pb2_grpc, profiles_pb2
 
 from src.storage.elasticsearch import database
-from src.utils import search_cities
+from src.utils import search_cities, search_profiles
 
 
 class RecommendationsService(recommendations_pb2_grpc.RecommendationsServiceServicer):
@@ -20,31 +20,14 @@ class RecommendationsService(recommendations_pb2_grpc.RecommendationsServiceServ
         request: recommendations_pb2.RecommendationsSearchProfilesRequest,
         context: grpc.aio.ServicerContext,
     ) -> recommendations_pb2.RecommendationsSearchProfilesResponse:
-        query = {
-            'query': {
-                'bool': {
-                    'must': [
-                        # {'term': {'gender': request.gender}},
-                        # {'range': {'age': {'gte': request.age_min, 'lte': request.age_max}}},
-                        {'match_all': {}},
-                    ],
-                    # 'filter': {
-                    #     'geo_distance': {
-                    #         'distance': f'{request.distance}km',
-                    #         'location': {'lat': request.lat, 'lon': request.lon},
-                    #     },
-                    # },
-                },
-            },
-            'size': request.limit,
-        }
         try:
-            response = await database.elasticsearch.search(index='profiles', body=query)
+            profile_ids, total = await search_profiles(
+                {'lat': request.lat, 'lon': request.lon},
+                age=request.age,
+                gender=request.gender,
+            )
         except Exception as exception:
             await context.abort(grpc.StatusCode.INTERNAL, str(exception))
-        hits = response['hits']['hits']
-        profile_ids = [hit['_id'] for hit in hits]
-        total = response['hits']['total']['value']
         return recommendations_pb2.RecommendationsSearchProfilesResponse(
             profile_ids=profile_ids,
             total=total
@@ -83,6 +66,8 @@ class RecommendationsService(recommendations_pb2_grpc.RecommendationsServiceServ
             'user_point': user_point_dict,
             'age': request.age,
             'gender': request.gender,
+            'description_len': request.description_len,
+            'photo_count': request.photo_count,
         }
         try:
             profile_response = await database.elasticsearch.index(

@@ -34,6 +34,8 @@ message RecommendationsUpdateProfileRequest {
         profiles.CityPoint city_point = 4;
         profiles.UserPoint user_point = 5;
     }
+    int32 description_len = 6;
+    int32 photo_count = 7;
 }
 
 message RecommendationsUpdateProfileResponse {

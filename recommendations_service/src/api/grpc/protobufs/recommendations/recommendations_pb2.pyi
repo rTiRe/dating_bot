@@ -7,22 +7,20 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class RecommendationsSearchProfilesRequest(_message.Message):
-    __slots__ = ("lat", "lon", "gender", "age_min", "age_max", "distance", "limit")
+    __slots__ = ("lat", "lon", "gender", "age", "distance", "limit")
     LAT_FIELD_NUMBER: _ClassVar[int]
     LON_FIELD_NUMBER: _ClassVar[int]
     GENDER_FIELD_NUMBER: _ClassVar[int]
-    AGE_MIN_FIELD_NUMBER: _ClassVar[int]
-    AGE_MAX_FIELD_NUMBER: _ClassVar[int]
+    AGE_FIELD_NUMBER: _ClassVar[int]
     DISTANCE_FIELD_NUMBER: _ClassVar[int]
     LIMIT_FIELD_NUMBER: _ClassVar[int]
     lat: float
     lon: float
     gender: _profiles_pb2.Gender
-    age_min: int
-    age_max: int
+    age: int
     distance: int
     limit: int
-    def __init__(self, lat: _Optional[float] = ..., lon: _Optional[float] = ..., gender: _Optional[_Union[_profiles_pb2.Gender, str]] = ..., age_min: _Optional[int] = ..., age_max: _Optional[int] = ..., distance: _Optional[int] = ..., limit: _Optional[int] = ...) -> None: ...
+    def __init__(self, lat: _Optional[float] = ..., lon: _Optional[float] = ..., gender: _Optional[_Union[_profiles_pb2.Gender, str]] = ..., age: _Optional[int] = ..., distance: _Optional[int] = ..., limit: _Optional[int] = ...) -> None: ...
 
 class RecommendationsSearchProfilesResponse(_message.Message):
     __slots__ = ("profile_ids", "total")
@@ -33,18 +31,22 @@ class RecommendationsSearchProfilesResponse(_message.Message):
     def __init__(self, profile_ids: _Optional[_Iterable[str]] = ..., total: _Optional[int] = ...) -> None: ...
 
 class RecommendationsUpdateProfileRequest(_message.Message):
-    __slots__ = ("profile_id", "age", "gender", "city_point", "user_point")
+    __slots__ = ("profile_id", "age", "gender", "city_point", "user_point", "description_len", "photo_count")
     PROFILE_ID_FIELD_NUMBER: _ClassVar[int]
     AGE_FIELD_NUMBER: _ClassVar[int]
     GENDER_FIELD_NUMBER: _ClassVar[int]
     CITY_POINT_FIELD_NUMBER: _ClassVar[int]
     USER_POINT_FIELD_NUMBER: _ClassVar[int]
+    DESCRIPTION_LEN_FIELD_NUMBER: _ClassVar[int]
+    PHOTO_COUNT_FIELD_NUMBER: _ClassVar[int]
     profile_id: str
     age: int
     gender: _profiles_pb2.Gender
     city_point: _profiles_pb2.CityPoint
     user_point: _profiles_pb2.UserPoint
-    def __init__(self, profile_id: _Optional[str] = ..., age: _Optional[int] = ..., gender: _Optional[_Union[_profiles_pb2.Gender, str]] = ..., city_point: _Optional[_Union[_profiles_pb2.CityPoint, _Mapping]] = ..., user_point: _Optional[_Union[_profiles_pb2.UserPoint, _Mapping]] = ...) -> None: ...
+    description_len: int
+    photo_count: int
+    def __init__(self, profile_id: _Optional[str] = ..., age: _Optional[int] = ..., gender: _Optional[_Union[_profiles_pb2.Gender, str]] = ..., city_point: _Optional[_Union[_profiles_pb2.CityPoint, _Mapping]] = ..., user_point: _Optional[_Union[_profiles_pb2.UserPoint, _Mapping]] = ..., description_len: _Optional[int] = ..., photo_count: _Optional[int] = ...) -> None: ...
 
 class RecommendationsUpdateProfileResponse(_message.Message):
     __slots__ = ("profile_id", "age", "gender", "city_id", "city_point", "user_point", "result")
