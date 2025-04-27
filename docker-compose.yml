@@ -4,7 +4,7 @@ services:
     container_name: rabbitmq
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
       interval: 3s
       timeout: 10s
       retries: 3
@@ -20,18 +20,11 @@ services:
       - external_network
 
   clickhouse:
-    image: clickhouse/clickhouse-server:latest
-    container_name: clickhouse
-    restart: unless-stopped
-    depends_on:
-      - rabbitmq
-    ports:
-      - "127.0.0.1:9000:9000"
-      - "127.0.0.1:8123:8123"
+    image: clickhouse/clickhouse-server:23.8
     volumes:
       - ./resources/clickhouse/config.xml:/etc/clickhouse-server/config.d/config.xml
-      - ./resources/clickhouse/init.sql:/opt/init.sql
-      - clickhouse_data:/var/lib/clickhouse
+      - ./resources/clickhouse/init.sql:/docker-entrypoint-initdb.d/init.sql
+      # - clickhouse_data:/var/lib/clickhouse
     networks:
       - external_network
 
