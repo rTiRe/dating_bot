@@ -108,13 +108,13 @@ class ProfilesRepository(BaseRepository):
             except ValueError:
                 raise ValueError(f'Invalid base64 for image {idx}')
             timestamp = int(time.time()*1000)
-            filename = f'{profile_id}_{timestamp}_{idx}.jpg'
+            filename = f'{profile_id}_{timestamp}_{idx}{minio.file_format}'
             minio.client.put_object(
                 bucket_name=minio.bucket,
                 object_name=filename,
                 data=io.BytesIO(img_data),
                 length=len(img_data),
-                content_type="image/jpeg",
+                content_type=minio.content_type,
             )
             files_names.append(filename)
         statement = f'update dating.profiles set image_names = ?? where id = ??'
