@@ -5,6 +5,7 @@ import grpc
 from asyncpg import UniqueViolationError
 
 from config import logger
+from src.api.grpc.connections.recommendations import recommendations_connection
 from src.api.grpc.protobufs.profiles import profiles_pb2, profiles_pb2_grpc
 from src.api.grpc.protobufs.profiles.profiles_pb2 import UserPoint, CityPoint
 from src.repositories.cities import CitiesRepository
@@ -286,6 +287,26 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
                 await self.name_to_checker[name](field_value)
             except ValueError as exception:
                 await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
+        lat_spec = EqualsSpecification('lat', request.data.city_point.lat)
+        lon_spec = EqualsSpecification('lon', request.data.city_point.lon)
+        profile_spec = EqualsSpecification('account_id', request.data.account_id)
+        async with database.pool.acquire() as connection:
+            cities = await CitiesRepository.get(connection, lat_spec, lon_spec)
+            profile = await ProfilesRepository.get(connection, profile_spec)[0]
+        if len(cities) == 0:
+            create_city_schema = CreateCitySchema(lat=request.data.city_point.lat, lon=request.data.city_point.lon)
+            city = await CitiesRepository.create(connection, create_city_schema)
+            await recommendations_connection.update_city(city_id=city.id, lat=city.lat, lon=city.lon)
+        profile_response = await recommendations_connection.update_profile(
+            profile_id=profile.id,
+            age=request.data.age,
+            gender=request.data.gender,
+            city_point=request.data.city_point,
+            user_point=request.data.user_point,
+        )
+        update_data['city_id'] = profile_response.city_id
+        update_data['lat'] = request.data.user_point.lat
+        update_data['lon'] = request.data.user_point.lon
         specification = EqualsSpecification('id', request.id)
         update_schema = UpdateProfileSchema(**update_data)
         update_result = 'UPDATE 0'

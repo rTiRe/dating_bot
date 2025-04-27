@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     MINIO_SECURE: bool
     MINIO_BUCKET: str
 
+    RECOMMENDATIONS_GRPC_URL: str
+
     LOGS_FILE: str = 'logs.log'
 
     model_config = SettingsConfigDict(
