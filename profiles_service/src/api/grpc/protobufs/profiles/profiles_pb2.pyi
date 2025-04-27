@@ -48,10 +48,10 @@ class ProfilesGetRequest(_message.Message):
     def __init__(self, id: _Optional[str] = ..., account_id: _Optional[str] = ...) -> None: ...
 
 class ProfilesGetListRequest(_message.Message):
-    __slots__ = ("profile_id",)
-    PROFILE_ID_FIELD_NUMBER: _ClassVar[int]
-    profile_id: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, profile_id: _Optional[_Iterable[str]] = ...) -> None: ...
+    __slots__ = ("profiles_ids",)
+    PROFILES_IDS_FIELD_NUMBER: _ClassVar[int]
+    profiles_ids: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, profiles_ids: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class ProfileUpdateRequest(_message.Message):
     __slots__ = ("id", "data")
@@ -153,6 +153,12 @@ class ProfilesGetResponse(_message.Message):
     city_point: CityPoint
     user_point: UserPoint
     def __init__(self, id: _Optional[str] = ..., account_id: _Optional[str] = ..., name: _Optional[str] = ..., age: _Optional[int] = ..., gender: _Optional[_Union[Gender, str]] = ..., biography: _Optional[str] = ..., language_locale: _Optional[str] = ..., created_at: _Optional[str] = ..., updated_at: _Optional[str] = ..., image_base64_list: _Optional[_Iterable[str]] = ..., rating: _Optional[int] = ..., interested_in: _Optional[_Union[Gender, str]] = ..., city_point: _Optional[_Union[CityPoint, _Mapping]] = ..., user_point: _Optional[_Union[UserPoint, _Mapping]] = ...) -> None: ...
+
+class ProfilesGetListResponse(_message.Message):
+    __slots__ = ("messages",)
+    MESSAGES_FIELD_NUMBER: _ClassVar[int]
+    messages: _containers.RepeatedCompositeFieldContainer[ProfilesGetResponse]
+    def __init__(self, messages: _Optional[_Iterable[_Union[ProfilesGetResponse, _Mapping]]] = ...) -> None: ...
 
 class ProfilesUpdateResponse(_message.Message):
     __slots__ = ("result",)

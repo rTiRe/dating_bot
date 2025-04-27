@@ -6,6 +6,7 @@ package dating.service.profiles;
 service ProfilesService {
     rpc Create(ProfileCreateRequest) returns (ProfileCreateResponse);
     rpc Get(ProfilesGetRequest) returns (ProfilesGetResponse);
+    rpc GetList(ProfilesGetListRequest) returns (ProfilesGetListResponse);
     rpc Update(ProfileUpdateRequest) returns (ProfilesUpdateResponse);
     rpc Delete(ProfileDeleteRequest) returns (ProfilesDeleteResponse);
 }
@@ -37,7 +38,7 @@ message ProfilesGetRequest {
 
 
 message ProfilesGetListRequest {
-    repeated string profile_id = 1;
+    repeated string profiles_ids = 1;
 }
 
 
@@ -104,6 +105,11 @@ message ProfilesGetResponse {
     Gender interested_in = 14;
     CityPoint city_point = 15;
     optional UserPoint user_point = 16;
+}
+
+
+message ProfilesGetListResponse {
+    repeated ProfilesGetResponse messages = 1;
 }
 
 
