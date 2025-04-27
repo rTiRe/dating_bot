@@ -54,10 +54,10 @@ class ProfilesRepository(BaseRepository):
 
     @staticmethod
     async def update(
-            connection: Connection,
-            *specifications: Specification,
-            update_all: bool = False,
-            update_data: UpdateProfileSchema,
+        connection: Connection,
+        *specifications: Specification,
+        update_all: bool = False,
+        update_data: UpdateProfileSchema,
     ) -> str:
         if not specifications and not update_all:
             raise UpdateAllRowsException(
