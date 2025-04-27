@@ -6,7 +6,7 @@ services:
     container_name: rabbitmq
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -32,9 +32,12 @@ services:
     environment:
       CLICKHOUSE_ALWAYS_RUN_INITDB_SCRIPTS: "1"
       CLICKHOUSE_INIT_TIMEOUT: 300
+      CLICKHOUSE_USER: "default"
+      CLICKHOUSE_PASSWORD: "default"
     volumes:
       - ./resources/clickhouse/config.xml:/etc/clickhouse-server/config.d/config.xml
       - ./resources/clickhouse/init.sql:/docker-entrypoint-initdb.d/init.sql
+      #- ./resources/clickhouse/disable-default-password.xml:/etc/clickhouse-server/config.d/disable-default-password.xml
     ports:
       - "127.0.0.1:9000:9000"
       - "127.0.0.1:8123:8123"
