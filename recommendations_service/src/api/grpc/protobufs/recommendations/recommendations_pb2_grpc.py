@@ -96,7 +96,7 @@ class RecommendationsService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(
+        return grpc.experimental.unary_unary( # type: ignore
             request,
             target,
             '/dating.service.recommendations.RecommendationsService/GetMatches',
@@ -123,7 +123,7 @@ class RecommendationsService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(
+        return grpc.experimental.unary_unary( # type: ignore
             request,
             target,
             '/dating.service.recommendations.RecommendationsService/UpdateUser',

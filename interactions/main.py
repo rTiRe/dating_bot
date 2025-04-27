@@ -12,7 +12,7 @@ class ClickHouseServicer(clickhouse_pb2_grpc.ClickHouseServiceServicer):
 
     async def setup(self):
         self.client = await clickhouse_connect.get_async_client(
-            host="clickhouse_service",
+            host="clickhouse_instance",
             port=8123,
             username="default",
             password="default"
@@ -82,9 +82,9 @@ async def serve():
     await servicer.setup()
 
     clickhouse_pb2_grpc.add_ClickHouseServiceServicer_to_server(servicer, server)
-    server.add_insecure_port('[::]:5069')
+    server.add_insecure_port('[::]:1337')
     await server.start()
-    print("Server started on port 5069")
+    print("Server started on port 1337")
     await server.wait_for_termination()
 
 if __name__ == "__main__":

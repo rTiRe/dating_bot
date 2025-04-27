@@ -23,9 +23,9 @@ async def send_message(connection: AbstractConnection, interaction_type: Interac
         body=json.dumps(data).encode(),
         delivery_mode=DeliveryMode.PERSISTENT
     )
-
-    await exchange.publish(message, routing_key='')
-    print(f"Sent message: {data}")
+    for i in range(50):
+        await exchange.publish(message, routing_key='')
+        print(f"Sent message: {data}")
 
 
 
@@ -37,12 +37,8 @@ async def main():
             login=RABBITMQ_USER,
             password=RABBITMQ_PASSWORD
             )
-        for i in range(100000):
-            await send_message(connection, InteractionType.LIKE, {LIKER_ID_FIELD: i, LIKED_ID_FIELD: i + 1})
-            await send_message(connection, InteractionType.DISLIKE, {LIKER_ID_FIELD: i, LIKED_ID_FIELD: i + 1})
-            await send_message(connection, InteractionType.DISLIKE, {LIKER_ID_FIELD: 1, LIKED_ID_FIELD: 2})
-            await send_message(connection, InteractionType.LIKE, {LIKER_ID_FIELD: 1, LIKED_ID_FIELD: 2})
-            await send_message(connection, InteractionType.DISLIKE, {LIKER_ID_FIELD: 1, LIKED_ID_FIELD: 2})
+        await send_message(connection, InteractionType.LIKE, {LIKER_ID_FIELD: 1, LIKED_ID_FIELD: 2})
+        await send_message(connection, InteractionType.DISLIKE, {LIKER_ID_FIELD: 1, LIKED_ID_FIELD: 2})
     except Exception as e:
         print(f"Error: {e}")
     finally:

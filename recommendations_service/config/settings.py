@@ -1,5 +1,5 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import SecretStr
+from pydantic_settings import BaseSettings, SettingsConfigDict # type: ignore
+from pydantic import SecretStr # type: ignore
 
 
 class Settings(BaseSettings):
