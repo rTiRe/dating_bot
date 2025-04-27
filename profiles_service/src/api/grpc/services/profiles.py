@@ -210,6 +210,65 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             user_point=UserPoint(lat=profile.lat, lon=profile.lon),
         )
 
+    async def GetList(
+        self,
+        request: profiles_pb2.ProfilesGetListRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> profiles_pb2.ProfilesGetListResponse:
+        profiles_identifiers = list(request.profiles_ids)
+        for identifier in profiles_identifiers:
+            try:
+                await self.name_to_checker['id'](identifier)
+            except ValueError as exception:
+                await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
+        profiles_response: list[profiles_pb2.ProfilesGetResponse] = []
+        async with database.pool.acquire() as connection:
+            for identifier in profiles_identifiers:
+                profile_specification = EqualsSpecification('id', identifier)
+                profiles = (await ProfilesRepository.get(connection, profile_specification))
+                if len(profiles) == 0:
+                    await context.abort(grpc.StatusCode.NOT_FOUND, f'Profile {identifier} was not found')
+                profile = profiles[0]
+                city_specification = EqualsSpecification('id', str(profile.city_id))
+                cities = (await CitiesRepository.get(connection, city_specification))
+                if len(cities) == 0:
+                    await context.abort(grpc.StatusCode.NOT_FOUND, f'City {profile.city_id} was not found')
+                city = cities[0]
+                image_base64_list = [
+                    await ProfilesRepository.download_image(minio_instance, image_name)
+                    for image_name in profile.image_names
+                ]
+                profiles_response.append(
+                    profiles_pb2.ProfilesGetResponse(
+                        id=str(profile.id),
+                        account_id=str(profile.account_id),
+                        name=profile.name,
+                        age=profile.age,
+                        gender=profile.gender.name,
+                        biography=profile.biography,
+                        language_locale=profile.language_locale,
+                        created_at=profile.created_at.isoformat(),
+                        updated_at=profile.updated_at.isoformat(),
+                        image_base64_list=image_base64_list,
+                        rating=profile.rating,
+                        interested_in=profile.interested_in.name,
+                        city_point=CityPoint(
+                            lat=city.lat,
+                            lon=city.lon,
+                            name=profile.city_name,
+                        ),
+                        user_point=UserPoint(
+                            lat=profile.lat,
+                            lon=profile.lon,
+                        ),
+                    )
+                )
+        return profiles_pb2.ProfilesGetListResponse(
+            messages=profiles_response,
+        )
+
+
+
     async def Update(
         self,
         request: profiles_pb2.ProfileUpdateRequest,
