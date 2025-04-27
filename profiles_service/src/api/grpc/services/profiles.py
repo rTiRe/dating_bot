@@ -304,9 +304,11 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             city_point=request.data.city_point,
             user_point=request.data.user_point,
         )
-        update_data['city_id'] = profile_response.city_id
-        update_data['lat'] = request.data.user_point.lat
-        update_data['lon'] = request.data.user_point.lon
+        if profile_response.HasField('city_id'):
+            update_data['city_id'] = profile_response.city_id
+        if profile_response.HasField('user_point'):
+            update_data['lat'] = request.data.user_point.lat
+            update_data['lon'] = request.data.user_point.lon
         specification = EqualsSpecification('id', request.id)
         update_schema = UpdateProfileSchema(**update_data)
         update_result = 'UPDATE 0'
