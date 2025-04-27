@@ -34,28 +34,50 @@ class RecommendationsServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.GetMatches = channel.unary_unary(
-                '/dating.service.recommendations.RecommendationsService/GetMatches',
-                request_serializer=recommendations__pb2.RecommendationsGetMatchRequest.SerializeToString,
-                response_deserializer=recommendations__pb2.RecommendationsGetMatchResponse.FromString,
+        self.UpdateProfile = channel.unary_unary(
+                '/dating.service.recommendations.RecommendationsService/UpdateProfile',
+                request_serializer=recommendations__pb2.RecommendationsUpdateProfileRequest.SerializeToString,
+                response_deserializer=recommendations__pb2.RecommendationsUpdateProfileResponse.FromString,
                 _registered_method=True)
-        self.UpdateUser = channel.unary_unary(
-                '/dating.service.recommendations.RecommendationsService/UpdateUser',
-                request_serializer=recommendations__pb2.RecommendationsUpdateUserRequest.SerializeToString,
-                response_deserializer=recommendations__pb2.RecommendationsUpdateUserResponse.FromString,
+        self.SearchProfiles = channel.unary_unary(
+                '/dating.service.recommendations.RecommendationsService/SearchProfiles',
+                request_serializer=recommendations__pb2.RecommendationsSearchProfilesRequest.SerializeToString,
+                response_deserializer=recommendations__pb2.RecommendationsSearchProfilesResponse.FromString,
+                _registered_method=True)
+        self.UpdateCity = channel.unary_unary(
+                '/dating.service.recommendations.RecommendationsService/UpdateCity',
+                request_serializer=recommendations__pb2.RecommendationsUpdateCityRequest.SerializeToString,
+                response_deserializer=recommendations__pb2.RecommendationsUpdateCityResponse.FromString,
+                _registered_method=True)
+        self.SearchCities = channel.unary_unary(
+                '/dating.service.recommendations.RecommendationsService/SearchCities',
+                request_serializer=recommendations__pb2.RecommendationsSearchCitiesRequest.SerializeToString,
+                response_deserializer=recommendations__pb2.RecommendationsSearchCitiesResponse.FromString,
                 _registered_method=True)
 
 
 class RecommendationsServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def GetMatches(self, request, context):
+    def UpdateProfile(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def UpdateUser(self, request, context):
+    def SearchProfiles(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def UpdateCity(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def SearchCities(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -64,15 +86,25 @@ class RecommendationsServiceServicer(object):
 
 def add_RecommendationsServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'GetMatches': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetMatches,
-                    request_deserializer=recommendations__pb2.RecommendationsGetMatchRequest.FromString,
-                    response_serializer=recommendations__pb2.RecommendationsGetMatchResponse.SerializeToString,
+            'UpdateProfile': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateProfile,
+                    request_deserializer=recommendations__pb2.RecommendationsUpdateProfileRequest.FromString,
+                    response_serializer=recommendations__pb2.RecommendationsUpdateProfileResponse.SerializeToString,
             ),
-            'UpdateUser': grpc.unary_unary_rpc_method_handler(
-                    servicer.UpdateUser,
-                    request_deserializer=recommendations__pb2.RecommendationsUpdateUserRequest.FromString,
-                    response_serializer=recommendations__pb2.RecommendationsUpdateUserResponse.SerializeToString,
+            'SearchProfiles': grpc.unary_unary_rpc_method_handler(
+                    servicer.SearchProfiles,
+                    request_deserializer=recommendations__pb2.RecommendationsSearchProfilesRequest.FromString,
+                    response_serializer=recommendations__pb2.RecommendationsSearchProfilesResponse.SerializeToString,
+            ),
+            'UpdateCity': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateCity,
+                    request_deserializer=recommendations__pb2.RecommendationsUpdateCityRequest.FromString,
+                    response_serializer=recommendations__pb2.RecommendationsUpdateCityResponse.SerializeToString,
+            ),
+            'SearchCities': grpc.unary_unary_rpc_method_handler(
+                    servicer.SearchCities,
+                    request_deserializer=recommendations__pb2.RecommendationsSearchCitiesRequest.FromString,
+                    response_serializer=recommendations__pb2.RecommendationsSearchCitiesResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -86,7 +118,7 @@ class RecommendationsService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def GetMatches(request,
+    def UpdateProfile(request,
             target,
             options=(),
             channel_credentials=None,
@@ -99,9 +131,9 @@ class RecommendationsService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/dating.service.recommendations.RecommendationsService/GetMatches',
-            recommendations__pb2.RecommendationsGetMatchRequest.SerializeToString,
-            recommendations__pb2.RecommendationsGetMatchResponse.FromString,
+            '/dating.service.recommendations.RecommendationsService/UpdateProfile',
+            recommendations__pb2.RecommendationsUpdateProfileRequest.SerializeToString,
+            recommendations__pb2.RecommendationsUpdateProfileResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -113,7 +145,7 @@ class RecommendationsService(object):
             _registered_method=True)
 
     @staticmethod
-    def UpdateUser(request,
+    def SearchProfiles(request,
             target,
             options=(),
             channel_credentials=None,
@@ -126,9 +158,63 @@ class RecommendationsService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/dating.service.recommendations.RecommendationsService/UpdateUser',
-            recommendations__pb2.RecommendationsUpdateUserRequest.SerializeToString,
-            recommendations__pb2.RecommendationsUpdateUserResponse.FromString,
+            '/dating.service.recommendations.RecommendationsService/SearchProfiles',
+            recommendations__pb2.RecommendationsSearchProfilesRequest.SerializeToString,
+            recommendations__pb2.RecommendationsSearchProfilesResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def UpdateCity(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/dating.service.recommendations.RecommendationsService/UpdateCity',
+            recommendations__pb2.RecommendationsUpdateCityRequest.SerializeToString,
+            recommendations__pb2.RecommendationsUpdateCityResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def SearchCities(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/dating.service.recommendations.RecommendationsService/SearchCities',
+            recommendations__pb2.RecommendationsSearchCitiesRequest.SerializeToString,
+            recommendations__pb2.RecommendationsSearchCitiesResponse.FromString,
             options,
             channel_credentials,
             insecure,
