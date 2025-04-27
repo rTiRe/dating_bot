@@ -10,7 +10,8 @@ async def send_message(connection: AbstractConnection, interaction_type: Interac
     exchange = await channel.declare_exchange(
         EXCHANGE_NAME,
         type=ExchangeType.FANOUT,
-        durable=True
+        durable=True,
+        passive=True,
     )
 
     queue: AbstractQueue = await channel.declare_queue(QUEUE_NAME, durable=True)

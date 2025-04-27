@@ -1,13 +1,15 @@
+version: '3.8'
+
 services:
   rabbitmq:
     image: rabbitmq:management
     container_name: rabbitmq
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
-      interval: 3s
-      timeout: 10s
-      retries: 3
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     ports:
       - "127.0.0.1:5672:5672"
       - "127.0.0.1:15672:15672"
@@ -15,23 +17,24 @@ services:
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: admin
     volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
-    networks:
-      - external_network
+      # 1) Конфигурация для импорта definitions.json
+      - ./resources/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      # 2) Сам файл с определениями обменников/очередей
+      - ./resources/rabbitmq/definitions.json:/etc/rabbitmq/definitions.json
 
   clickhouse:
-    image: clickhouse/clickhouse-server:23.8
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    restart: on-failure
+    environment:
+      CLICKHOUSE_ALWAYS_RUN_INITDB_SCRIPTS: "1"
+      CLICKHOUSE_INIT_TIMEOUT: 300
     volumes:
       - ./resources/clickhouse/config.xml:/etc/clickhouse-server/config.d/config.xml
       - ./resources/clickhouse/init.sql:/docker-entrypoint-initdb.d/init.sql
-      # - clickhouse_data:/var/lib/clickhouse
-    networks:
-      - external_network
-
-networks:
-  external_network:
-    driver: bridge
-
-volumes:
-  rabbitmq_data:
-  clickhouse_data:
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:8123:8123"

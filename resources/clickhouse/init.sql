@@ -1,31 +1,40 @@
-CREATE DATABASE IF NOT EXISTS event;
+CREATE DATABASE IF NOT EXISTS dating;
 
-USE event;
+USE dating;
 
-CREATE TABLE IF NOT EXISTS event (
+-- Таблица для хранения результирующих событий (Memory или MergeTree по необходимости)
+CREATE TABLE IF NOT EXISTS interactions (
     `timestamp` DateTime,
-    `id` UInt32,
-    `body` String
-) Engine = Memory;
+    `liker_id` UInt32,
+    `liked_id` UInt32,
+    `interaction_type` String
+) ENGINE = Memory;
 
-CREATE TABLE IF NOT EXISTS rabbitmq_entry
-(
-    `timestamp` UInt64,
-    `id` UInt32,
-    `body` String
-) ENGINE = RabbitMQ SETTINGS
-    rabbitmq_host_port = 'rabbitmq:5672',
-    rabbitmq_exchange_name = 'interactions_exchange',
-    rabbitmq_routing_key_list = 'interactions_queue',
-    rabbitmq_format = 'JSONEachRow',
-    rabbitmq_exchange_type = 'fanout',
-    rabbitmq_num_consumers = 1
-    ;
+-- Источник данных из RabbitMQ
+CREATE TABLE IF NOT EXISTS rabbitmq_entry (
+    timestamp         UInt64,
+    liker_id          UInt32,
+    liked_id          UInt32,
+    interaction_type  String
+) ENGINE = RabbitMQ
+SETTINGS
+    rabbitmq_host_port       = 'rabbitmq:5672',
+    rabbitmq_exchange_name   = 'interactions_exchange',
+    rabbitmq_routing_key_list= 'interactions_queue',
+    rabbitmq_format          = 'JSONEachRow',
+    rabbitmq_exchange_type   = 'fanout',
+    rabbitmq_num_consumers   = 1,
+    rabbitmq_queue_base      = 'interactions_queue',
+    rabbitmq_queue_consume   = true
+;
 
+
+-- Материализованное представление для переноса данных в конечную таблицу
 CREATE MATERIALIZED VIEW IF NOT EXISTS event_view
-TO event AS
+TO interactions AS
 SELECT
-    toDateTime(toUInt64(divide(timestamp, 1000000000))) AS timestamp,
-    id AS id,
-    body AS body
+    toDateTime(timestamp / 1000000000) AS timestamp,
+    liker_id,
+    liked_id,
+    interaction_type
 FROM rabbitmq_entry;

@@ -1,0 +1,47 @@
+{
+  "users": [
+    {
+      "name": "admin",
+      "password": "admin",
+      "tags": "administrator"
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "/"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "admin",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "interactions_exchange",
+      "vhost": "/",
+      "type": "fanout",
+      "durable": true
+    }
+  ],
+  "queues": [
+    {
+      "name": "interactions_queue",
+      "vhost": "/",
+      "durable": true
+    }
+  ],
+  "bindings": [
+    {
+      "source": "interactions_exchange",
+      "vhost": "/",
+      "destination": "interactions_queue",
+      "destination_type": "queue",
+      "routing_key": ""
+    }
+  ]
+}
