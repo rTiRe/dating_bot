@@ -1,25 +1,10 @@
 import asyncio
 import json
-import os
-from typing import Dict, Any
-from aio_pika import connect_robust, Message, Queue
+from aio_pika import connect_robust, Message
 from aio_pika.abc import AbstractChannel, AbstractConnection, AbstractQueue
 from db import Database
+from config import *
 
-# RabbitMQ connection parameters
-RABBITMQ_HOST = os.getenv('RABBITMQ_HOST', 'localhost')
-RABBITMQ_PORT = int(os.getenv('RABBITMQ_PORT', 5672))
-RABBITMQ_USER = os.getenv('RABBITMQ_USER', 'admin')
-RABBITMQ_PASSWORD = os.getenv('RABBITMQ_PASSWORD', 'admin')
-
-# Queue names
-LIKE_QUEUE = 'likes'
-DISLIKE_QUEUE = 'dislikes'
-
-LIKER_ID_FIELD = 'liker_id'
-LIKED_ID_FIELD = 'liked_id'
-DISLIKER_ID_FIELD = 'disliker_id'
-DISLIKED_ID_FIELD = 'disliked_id'
 
 
 
@@ -27,8 +12,7 @@ class InteractionsService:
     def __init__(self):
         self.connection: AbstractConnection | None = None
         self.channel: AbstractChannel | None = None
-        self.like_queue: AbstractQueue | None = None
-        self.dislike_queue: AbstractQueue | None = None
+        self.queue: AbstractQueue | None = None
         self.exit = False
         self.db = Database()
 
@@ -41,37 +25,28 @@ class InteractionsService:
         )
         self.channel = await self.connection.channel()
 
-        self.like_queue = await self.channel.declare_queue(
-            LIKE_QUEUE,
-            durable=True
-        )
-        self.dislike_queue = await self.channel.declare_queue(
-            DISLIKE_QUEUE,
+        self.queue = await self.channel.declare_queue(
+            QUEUE_NAME,
             durable=True
         )
         await self.db.setup()
 
-    async def process_like(self, message: Message):
+    async def process_interaction(self, message: Message):
         async with message.process():
             try:
                 data = json.loads(message.body.decode())
-                await self.db.add_like(data[LIKER_ID_FIELD], data[LIKED_ID_FIELD])
-                print(f"Processed like: {data}")
+                interaction_type = InteractionType.from_string(data[INTERACTION_TYPE_FIELD])
+                if interaction_type == InteractionType.LIKE:
+                    await self.db.add_like(data[LIKER_ID_FIELD], data[LIKED_ID_FIELD])
+                    print(f"Processed like: {data}")
+                else:
+                    await self.db.add_dislike(data[LIKER_ID_FIELD], data[LIKED_ID_FIELD])
+                    print(f"Processed dislike: {data}")
             except Exception as e:
-                print(f"Error processing like: {e}")
-
-    async def process_dislike(self, message: Message):
-        async with message.process():
-            try:
-                data = json.loads(message.body.decode())
-                await self.db.add_dislike(data[DISLIKER_ID_FIELD], data[DISLIKED_ID_FIELD])
-                print(f"Processed dislike: {data}")
-            except Exception as e:
-                print(f"Error processing dislike: {e}")
+                print(f"Error processing interaction: {e}")
 
     async def start_consuming(self):
-        await self.like_queue.consume(self.process_like)
-        await self.dislike_queue.consume(self.process_dislike)
+        await self.queue.consume(self.process_interaction)
         print('Started consuming messages...')
 
 
