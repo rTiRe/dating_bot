@@ -192,6 +192,8 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             if len(cities) == 0:
                 await context.abort(grpc.StatusCode.NOT_FOUND, f'City {profile.id} was not found')
             city = cities[0]
+        if not profile.image_names:
+            profile.image_names.append(f'{minio_instance.default_name}{minio_instance.file_format}')
         image_base64_list = [await ProfilesRepository.download_image(minio_instance, image_name) for image_name in profile.image_names]
         return profiles_pb2.ProfilesGetResponse(
             id=str(profile.id),
@@ -234,6 +236,8 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
                 if len(cities) == 0:
                     await context.abort(grpc.StatusCode.NOT_FOUND, f'City {profile.city_id} was not found')
                 city = cities[0]
+                if not profile.image_names:
+                    profile.image_names.append(f'{minio_instance.default_name}{minio_instance.file_format}')
                 image_base64_list = [
                     await ProfilesRepository.download_image(minio_instance, image_name)
                     for image_name in profile.image_names
@@ -266,7 +270,6 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
         return profiles_pb2.ProfilesGetListResponse(
             messages=profiles_response,
         )
-
 
 
     async def Update(
