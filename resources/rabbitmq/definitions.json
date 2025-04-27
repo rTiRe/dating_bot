@@ -33,6 +33,11 @@
       "name": "interactions_queue",
       "vhost": "/",
       "durable": true
+    },
+    {
+      "name": "clickhouse_queue",
+      "vhost": "/",
+      "durable": true
     }
   ],
   "bindings": [
@@ -40,6 +45,13 @@
       "source": "interactions_exchange",
       "vhost": "/",
       "destination": "interactions_queue",
+      "destination_type": "queue",
+      "routing_key": ""
+    },
+    {
+      "source": "interactions_exchange",
+      "vhost": "/",
+      "destination": "clickhouse_queue",
       "destination_type": "queue",
       "routing_key": ""
     }

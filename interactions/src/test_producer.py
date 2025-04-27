@@ -37,8 +37,12 @@ async def main():
             login=RABBITMQ_USER,
             password=RABBITMQ_PASSWORD
             )
-        await send_message(connection, InteractionType.LIKE, {LIKER_ID_FIELD: 1, LIKED_ID_FIELD: 2})
-        await send_message(connection, InteractionType.DISLIKE, {LIKER_ID_FIELD: 1, LIKED_ID_FIELD: 2})
+        for i in range(100000):
+            await send_message(connection, InteractionType.LIKE, {LIKER_ID_FIELD: i, LIKED_ID_FIELD: i + 1})
+            await send_message(connection, InteractionType.DISLIKE, {LIKER_ID_FIELD: i, LIKED_ID_FIELD: i + 1})
+            await send_message(connection, InteractionType.DISLIKE, {LIKER_ID_FIELD: 1, LIKED_ID_FIELD: 2})
+            await send_message(connection, InteractionType.LIKE, {LIKER_ID_FIELD: 1, LIKED_ID_FIELD: 2})
+            await send_message(connection, InteractionType.DISLIKE, {LIKER_ID_FIELD: 1, LIKED_ID_FIELD: 2})
     except Exception as e:
         print(f"Error: {e}")
     finally:

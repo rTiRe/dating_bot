@@ -17,14 +17,12 @@ services:
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: admin
     volumes:
-      # 1) Конфигурация для импорта definitions.json
       - ./resources/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
-      # 2) Сам файл с определениями обменников/очередей
       - ./resources/rabbitmq/definitions.json:/etc/rabbitmq/definitions.json
 
-  clickhouse:
+  clickhouse_service:
     image: clickhouse/clickhouse-server:latest
-    container_name: clickhouse
+    container_name: clickhouse_service
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -37,7 +35,22 @@ services:
     volumes:
       - ./resources/clickhouse/config.xml:/etc/clickhouse-server/config.d/config.xml
       - ./resources/clickhouse/init.sql:/docker-entrypoint-initdb.d/init.sql
-      #- ./resources/clickhouse/disable-default-password.xml:/etc/clickhouse-server/config.d/disable-default-password.xml
+    healthcheck:
+      test: [ "CMD-SHELL", "clickhouse-client --query \"SELECT 1\" --user default --password default || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  clickhouse:
+    build:
+      context: ./clickhouse
+      dockerfile: Dockerfile
+    container_name: clickhouse
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      clickhouse_service:
+        condition: service_healthy
     ports:
-      - "127.0.0.1:9000:9000"
-      - "127.0.0.1:8123:8123"
+      - "127.0.0.1:5069:5069"

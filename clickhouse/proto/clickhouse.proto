@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package clickhouse;
+
+service ClickHouseService {
+  rpc GetUserInteractions(GetUserInteractionsRequest) returns (GetUserInteractionsResponse);
+
+  rpc GetUserReceivedLikes(GetUserReceivedLikesRequest) returns (GetUserReceivedLikesResponse);
+
+  rpc GetUserReceivedDislikes(GetUserReceivedDislikesRequest) returns (GetUserReceivedDislikesResponse);
+}
+
+message GetUserInteractionsRequest {
+  string user_id = 1;
+}
+
+message GetUserInteractionsResponse {
+  repeated Interaction interactions = 1;
+}
+
+message GetUserReceivedLikesRequest {
+  string user_id = 1;
+}
+
+message GetUserReceivedLikesResponse {
+  repeated Like likes = 1;
+}
+
+message GetUserReceivedDislikesRequest {
+  string user_id = 1;
+}
+
+message GetUserReceivedDislikesResponse {
+  repeated Dislike dislikes = 1;
+}
+
+message Interaction {
+  string timestamp = 1;
+  string liker_id = 2;
+  string liked_id = 3;
+  string interaction_type = 4;
+}
+
+message Like {
+  string timestamp = 1;
+  string liker_id = 2;
+  string liked_id = 3;
+}
+
+message Dislike {
+  string timestamp = 1;
+  string disliker_id = 2;
+  string disliked_id = 3;
+}
