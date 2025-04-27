@@ -116,13 +116,13 @@ message ProfilesDeleteResponse {
 
 message CityPoint {
     string name = 1;
-    float lan = 2;
+    float lat = 2;
     float lon = 3;
 }
 
 
 message UserPoint {
-    float lan = 1;
+    float lat = 1;
     float lon = 2;
 }
 

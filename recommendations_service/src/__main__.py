@@ -28,8 +28,9 @@ if __name__ == '__main__':
     uvicorn.run(
         'src.__main__:create_app',
         factory=True,
-        host='127.0.0.1',
+        host='0.0.0.0',
         port=8001,  # noqa: WPS432
         workers=1,
         access_log=False,
+        reload=True,
     )
