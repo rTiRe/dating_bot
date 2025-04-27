@@ -10,4 +10,4 @@ CREATE TABLE IF NOT EXISTS dating."cities" (
 CREATE INDEX cities_points_idx ON dating."cities" (lat, lon);
 
 ALTER TABLE dating."profiles" ADD COLUMN city_name VARCHAR(256);
-ALTER TABLE dating."profiles" ADD COLUMN city UUID REFERENCES dating."cities";
+ALTER TABLE dating."profiles" ADD COLUMN city_id UUID REFERENCES dating."cities";

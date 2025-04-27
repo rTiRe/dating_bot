@@ -47,6 +47,12 @@ class ProfilesGetRequest(_message.Message):
     account_id: str
     def __init__(self, id: _Optional[str] = ..., account_id: _Optional[str] = ...) -> None: ...
 
+class ProfilesGetListRequest(_message.Message):
+    __slots__ = ("profile_id",)
+    PROFILE_ID_FIELD_NUMBER: _ClassVar[int]
+    profile_id: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, profile_id: _Optional[_Iterable[str]] = ...) -> None: ...
+
 class ProfileUpdateRequest(_message.Message):
     __slots__ = ("id", "data")
     class UpdateData(_message.Message):
@@ -161,19 +167,19 @@ class ProfilesDeleteResponse(_message.Message):
     def __init__(self, result: _Optional[str] = ...) -> None: ...
 
 class CityPoint(_message.Message):
-    __slots__ = ("name", "lan", "lon")
+    __slots__ = ("name", "lat", "lon")
     NAME_FIELD_NUMBER: _ClassVar[int]
-    LAN_FIELD_NUMBER: _ClassVar[int]
+    LAT_FIELD_NUMBER: _ClassVar[int]
     LON_FIELD_NUMBER: _ClassVar[int]
     name: str
-    lan: float
+    lat: float
     lon: float
-    def __init__(self, name: _Optional[str] = ..., lan: _Optional[float] = ..., lon: _Optional[float] = ...) -> None: ...
+    def __init__(self, name: _Optional[str] = ..., lat: _Optional[float] = ..., lon: _Optional[float] = ...) -> None: ...
 
 class UserPoint(_message.Message):
-    __slots__ = ("lan", "lon")
-    LAN_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ("lat", "lon")
+    LAT_FIELD_NUMBER: _ClassVar[int]
     LON_FIELD_NUMBER: _ClassVar[int]
-    lan: float
+    lat: float
     lon: float
-    def __init__(self, lan: _Optional[float] = ..., lon: _Optional[float] = ...) -> None: ...
+    def __init__(self, lat: _Optional[float] = ..., lon: _Optional[float] = ...) -> None: ...

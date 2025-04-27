@@ -36,6 +36,11 @@ message ProfilesGetRequest {
 }
 
 
+message ProfilesGetListRequest {
+    repeated string profile_id = 1;
+}
+
+
 message ProfileUpdateRequest {
     message UpdateData {
         reserved 8, 9;
@@ -97,10 +102,8 @@ message ProfilesGetResponse {
     repeated string image_base64_list = 10;
     int32 rating = 13;
     Gender interested_in = 14;
-    oneof coordinates {
-        CityPoint city_point = 15;
-        UserPoint user_point = 16;
-    }
+    CityPoint city_point = 15;
+    optional UserPoint user_point = 16;
 }
 
 
@@ -116,13 +119,13 @@ message ProfilesDeleteResponse {
 
 message CityPoint {
     string name = 1;
-    float lan = 2;
+    float lat = 2;
     float lon = 3;
 }
 
 
 message UserPoint {
-    float lan = 1;
+    float lat = 1;
     float lon = 2;
 }
 
