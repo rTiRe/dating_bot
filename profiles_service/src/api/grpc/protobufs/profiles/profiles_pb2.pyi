@@ -47,6 +47,12 @@ class ProfilesGetRequest(_message.Message):
     account_id: str
     def __init__(self, id: _Optional[str] = ..., account_id: _Optional[str] = ...) -> None: ...
 
+class ProfilesGetListRequest(_message.Message):
+    __slots__ = ("profiles_ids",)
+    PROFILES_IDS_FIELD_NUMBER: _ClassVar[int]
+    profiles_ids: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, profiles_ids: _Optional[_Iterable[str]] = ...) -> None: ...
+
 class ProfileUpdateRequest(_message.Message):
     __slots__ = ("id", "data")
     class UpdateData(_message.Message):
@@ -148,6 +154,12 @@ class ProfilesGetResponse(_message.Message):
     user_point: UserPoint
     def __init__(self, id: _Optional[str] = ..., account_id: _Optional[str] = ..., name: _Optional[str] = ..., age: _Optional[int] = ..., gender: _Optional[_Union[Gender, str]] = ..., biography: _Optional[str] = ..., language_locale: _Optional[str] = ..., created_at: _Optional[str] = ..., updated_at: _Optional[str] = ..., image_base64_list: _Optional[_Iterable[str]] = ..., rating: _Optional[int] = ..., interested_in: _Optional[_Union[Gender, str]] = ..., city_point: _Optional[_Union[CityPoint, _Mapping]] = ..., user_point: _Optional[_Union[UserPoint, _Mapping]] = ...) -> None: ...
 
+class ProfilesGetListResponse(_message.Message):
+    __slots__ = ("messages",)
+    MESSAGES_FIELD_NUMBER: _ClassVar[int]
+    messages: _containers.RepeatedCompositeFieldContainer[ProfilesGetResponse]
+    def __init__(self, messages: _Optional[_Iterable[_Union[ProfilesGetResponse, _Mapping]]] = ...) -> None: ...
+
 class ProfilesUpdateResponse(_message.Message):
     __slots__ = ("result",)
     RESULT_FIELD_NUMBER: _ClassVar[int]
@@ -161,19 +173,19 @@ class ProfilesDeleteResponse(_message.Message):
     def __init__(self, result: _Optional[str] = ...) -> None: ...
 
 class CityPoint(_message.Message):
-    __slots__ = ("name", "lan", "lon")
+    __slots__ = ("name", "lat", "lon")
     NAME_FIELD_NUMBER: _ClassVar[int]
-    LAN_FIELD_NUMBER: _ClassVar[int]
+    LAT_FIELD_NUMBER: _ClassVar[int]
     LON_FIELD_NUMBER: _ClassVar[int]
     name: str
-    lan: float
+    lat: float
     lon: float
-    def __init__(self, name: _Optional[str] = ..., lan: _Optional[float] = ..., lon: _Optional[float] = ...) -> None: ...
+    def __init__(self, name: _Optional[str] = ..., lat: _Optional[float] = ..., lon: _Optional[float] = ...) -> None: ...
 
 class UserPoint(_message.Message):
-    __slots__ = ("lan", "lon")
-    LAN_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ("lat", "lon")
+    LAT_FIELD_NUMBER: _ClassVar[int]
     LON_FIELD_NUMBER: _ClassVar[int]
-    lan: float
+    lat: float
     lon: float
-    def __init__(self, lan: _Optional[float] = ..., lon: _Optional[float] = ...) -> None: ...
+    def __init__(self, lat: _Optional[float] = ..., lon: _Optional[float] = ...) -> None: ...

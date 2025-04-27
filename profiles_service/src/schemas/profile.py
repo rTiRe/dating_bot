@@ -20,6 +20,12 @@ def check_gender(gender: GenderEnum | int) -> GenderEnum:
     return GenderEnum(gender)
 
 
+class CityPoint(BaseModel):
+    name: str
+    lat: float
+    lon: float
+
+
 class ProfileSchema(BaseModel):
     id: UUID
     account_id: UUID
@@ -31,10 +37,12 @@ class ProfileSchema(BaseModel):
     created_at: datetime
     updated_at: datetime
     image_names: list[str]
-    lat: float
-    lon: float
+    lat: float | None = None
+    lon: float | None = None
     rating: int
     interested_in: Annotated[GenderEnum | int, AfterValidator(check_gender)]
+    city_id: UUID
+    city_name: str
 
 
 class CreateProfileSchema(BaseModel):
@@ -44,9 +52,11 @@ class CreateProfileSchema(BaseModel):
     gender: Annotated[GenderEnum | int, AfterValidator(check_gender)]
     biography: str | None = None
     language_locale: str
-    lat: float
-    lon: float
+    lat: float | None = None
+    lon: float | None = None
     interested_in: Annotated[GenderEnum | int, AfterValidator(check_gender)]
+    city_id: UUID | None = None
+    city_name: str | None = None
 
 
 class UpdateProfileSchema(BaseModel):
@@ -59,3 +69,5 @@ class UpdateProfileSchema(BaseModel):
     lat: float | None = None
     lon: float | None = None
     interested_in: Annotated[GenderEnum | int, AfterValidator(check_gender)] | None = None
+    city_id: UUID | None = None
+    city_name: str | None = None

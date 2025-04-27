@@ -6,7 +6,10 @@ from asyncpg import UniqueViolationError
 
 from config import logger
 from src.api.grpc.protobufs.profiles import profiles_pb2, profiles_pb2_grpc
+from src.api.grpc.protobufs.profiles.profiles_pb2 import UserPoint, CityPoint
+from src.repositories.cities import CitiesRepository
 from src.repositories.profiles import ProfilesRepository
+from src.schemas.city import CreateCitySchema
 from src.schemas.profile import UpdateProfileSchema, CreateProfileSchema
 from src.specifications.equals import EqualsSpecification
 from src.storage.minio import minio_instance
@@ -76,6 +79,16 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
         if not coordinate:
             raise ValueError('The coordinates fields must be set')
 
+    @staticmethod
+    async def __check_city_point(city: CityPoint):
+        if city and not (city.lat or city.lon or city.name):
+            raise ValueError('The city point fields must all be set')
+
+    @staticmethod
+    async def __check_user_point(point: UserPoint):
+        if point and not (point.lat or point.lon):
+            raise ValueError('The user point fields must all be set')
+
     name_to_checker = {
         'id': __check_id,
         'account_id': __check_id,
@@ -88,6 +101,8 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
         'lat': __check_coordinates,
         'lon': __check_coordinates,
         'interested_in': __check_gender,
+        'city_point': __check_city_point,
+        'user_point': __check_user_point,
     }
 
 
@@ -101,20 +116,28 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
                 await self.name_to_checker[descriptor.name](field_value)
         except ValueError as exception:
             await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
-        create_schema = CreateProfileSchema(
+        create_profile_schema = CreateProfileSchema(
             account_id=UUID(request.account_id),
             name=request.name,
             age=request.age,
             gender=request.gender,
             biography=request.biography,
             language_locale=request.language_locale,
-            lat=request.lat,
-            lon=request.lon,
-            interested_in=request.interested_in
+            lat=request.user_point.lat,
+            lon=request.user_point.lon,
+            interested_in=request.interested_in,
+            city_name=request.city_point.name,
         )
         async with database.pool.acquire() as connection:
+            if request.city_point:
+                create_city_schema = CreateCitySchema(lat=request.city_point.lat, lon=request.city_point.lon)
+                try:
+                    city = await CitiesRepository.create(connection, create_city_schema)
+                except UniqueViolationError:
+                    await context.abort(grpc.StatusCode.ALREADY_EXISTS)
+                create_profile_schema.city_id = city.id
             try:
-                profile = await ProfilesRepository.create(connection, create_schema)
+                profile = await ProfilesRepository.create(connection, create_profile_schema)
             except UniqueViolationError:
                 await context.abort(grpc.StatusCode.ALREADY_EXISTS)
             try:
@@ -137,9 +160,9 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             language_locale=request.language_locale,
             created_at=profile.created_at.isoformat(),
             updated_at=profile.updated_at.isoformat(),
-            lat=profile.lat,
-            lon=profile.lon,
             rating=profile.rating,
+            interested_in=profile.interested_in.name,
+            city_point=CityPoint(lat=city.lat, lon=city.lon, name=profile.city_name),
         )
 
 
@@ -148,22 +171,27 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
         request: profiles_pb2.ProfilesGetRequest,
         context: grpc.aio.ServicerContext
     ) -> profiles_pb2.ProfilesGetResponse:
-        identifier_field = request.WhichOneof('identifier')
-        if not identifier_field:
+        profile_identifier = request.WhichOneof('identifier')
+        if not profile_identifier:
             await context.abort(
                 grpc.StatusCode.INVALID_ARGUMENT,
                 'The id or telegram_id field must be present',
             )
         try:
-            await self.name_to_checker[identifier_field](getattr(request, identifier_field))
+            await self.name_to_checker[profile_identifier](getattr(request, profile_identifier))
         except ValueError as exception:
             await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
-        specification = EqualsSpecification(identifier_field, getattr(request, identifier_field))
+        specification = EqualsSpecification(profile_identifier, getattr(request, profile_identifier))
         async with database.pool.acquire() as connection:
             profiles = (await ProfilesRepository.get(connection, specification))
             if len(profiles) == 0:
-                await context.abort(grpc.StatusCode.NOT_FOUND)
+                await context.abort(grpc.StatusCode.NOT_FOUND, f'Profile {getattr(request, profile_identifier)} was not found')
             profile = profiles[0]
+            city_specification = EqualsSpecification('id', str(profile.city_id))
+            cities = (await CitiesRepository.get(connection, city_specification))
+            if len(cities) == 0:
+                await context.abort(grpc.StatusCode.NOT_FOUND, f'City {profile.id} was not found')
+            city = cities[0]
         image_base64_list = [await ProfilesRepository.download_image(minio_instance, image_name) for image_name in profile.image_names]
         return profiles_pb2.ProfilesGetResponse(
             id=str(profile.id),
@@ -176,11 +204,70 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             created_at=profile.created_at.isoformat(),
             updated_at=profile.updated_at.isoformat(),
             image_base64_list=image_base64_list,
-            lat=profile.lat,
-            lon=profile.lon,
             rating=profile.rating,
             interested_in=profile.interested_in.name,
+            city_point=CityPoint(lat=city.lat, lon=city.lon, name=profile.city_name),
+            user_point=UserPoint(lat=profile.lat, lon=profile.lon),
         )
+
+    async def GetList(
+        self,
+        request: profiles_pb2.ProfilesGetListRequest,
+        context: grpc.aio.ServicerContext,
+    ) -> profiles_pb2.ProfilesGetListResponse:
+        profiles_identifiers = list(request.profiles_ids)
+        for identifier in profiles_identifiers:
+            try:
+                await self.name_to_checker['id'](identifier)
+            except ValueError as exception:
+                await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
+        profiles_response: list[profiles_pb2.ProfilesGetResponse] = []
+        async with database.pool.acquire() as connection:
+            for identifier in profiles_identifiers:
+                profile_specification = EqualsSpecification('id', identifier)
+                profiles = (await ProfilesRepository.get(connection, profile_specification))
+                if len(profiles) == 0:
+                    await context.abort(grpc.StatusCode.NOT_FOUND, f'Profile {identifier} was not found')
+                profile = profiles[0]
+                city_specification = EqualsSpecification('id', str(profile.city_id))
+                cities = (await CitiesRepository.get(connection, city_specification))
+                if len(cities) == 0:
+                    await context.abort(grpc.StatusCode.NOT_FOUND, f'City {profile.city_id} was not found')
+                city = cities[0]
+                image_base64_list = [
+                    await ProfilesRepository.download_image(minio_instance, image_name)
+                    for image_name in profile.image_names
+                ]
+                profiles_response.append(
+                    profiles_pb2.ProfilesGetResponse(
+                        id=str(profile.id),
+                        account_id=str(profile.account_id),
+                        name=profile.name,
+                        age=profile.age,
+                        gender=profile.gender.name,
+                        biography=profile.biography,
+                        language_locale=profile.language_locale,
+                        created_at=profile.created_at.isoformat(),
+                        updated_at=profile.updated_at.isoformat(),
+                        image_base64_list=image_base64_list,
+                        rating=profile.rating,
+                        interested_in=profile.interested_in.name,
+                        city_point=CityPoint(
+                            lat=city.lat,
+                            lon=city.lon,
+                            name=profile.city_name,
+                        ),
+                        user_point=UserPoint(
+                            lat=profile.lat,
+                            lon=profile.lon,
+                        ),
+                    )
+                )
+        return profiles_pb2.ProfilesGetListResponse(
+            messages=profiles_response,
+        )
+
+
 
     async def Update(
         self,
@@ -198,8 +285,9 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
                 await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
         specification = EqualsSpecification('id', request.id)
         update_schema = UpdateProfileSchema(**update_data)
+        update_result = 'UPDATE 0'
         async with database.pool.acquire() as connection:
-            if any(update_schema.model_dump().values()):
+            if any(update_schema.model_dump().values()) or not update_schema.biography is None:
                 try:
                     update_result = await ProfilesRepository.update(
                         connection,

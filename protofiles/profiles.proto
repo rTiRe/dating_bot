@@ -6,6 +6,7 @@ package dating.service.profiles;
 service ProfilesService {
     rpc Create(ProfileCreateRequest) returns (ProfileCreateResponse);
     rpc Get(ProfilesGetRequest) returns (ProfilesGetResponse);
+    rpc GetList(ProfilesGetListRequest) returns (ProfilesGetListResponse);
     rpc Update(ProfileUpdateRequest) returns (ProfilesUpdateResponse);
     rpc Delete(ProfileDeleteRequest) returns (ProfilesDeleteResponse);
 }
@@ -33,6 +34,11 @@ message ProfilesGetRequest {
         string id = 1;
         string account_id = 2;
     }
+}
+
+
+message ProfilesGetListRequest {
+    repeated string profiles_ids = 1;
 }
 
 
@@ -97,10 +103,13 @@ message ProfilesGetResponse {
     repeated string image_base64_list = 10;
     int32 rating = 13;
     Gender interested_in = 14;
-    oneof coordinates {
-        CityPoint city_point = 15;
-        UserPoint user_point = 16;
-    }
+    CityPoint city_point = 15;
+    optional UserPoint user_point = 16;
+}
+
+
+message ProfilesGetListResponse {
+    repeated ProfilesGetResponse messages = 1;
 }
 
 
