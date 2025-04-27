@@ -59,27 +59,25 @@ class RecommendationsService(recommendations_pb2_grpc.RecommendationsServiceServ
         city_point_dict = None
         user_point_dict = None
         if request.HasField('city_point'):
-            city_point_dict = {
-                'lat': request.city_point.lat,
-                'lon': request.city_point.lon,
-            }
-        if request.HasField('user_point'):
-            try:
-                cities, _total = await search_cities(
-                    lat=request.user_point.lat,
-                    lon=request.user_point.lon,
-                    distance=25,
-                    limit=1,
-                )
-            except Exception as exception:
-                await context.abort(grpc.StatusCode.INTERNAL, str(exception))
+            point = request.city_point
+        else:
+            point = request.user_point
             user_point_dict = {
                 'lat': request.user_point.lat,
                 'lon': request.user_point.lon,
             }
-            if cities:
-                city_id = cities[0][0]
-                city_point_dict = cities[0][1]
+        try:
+            cities, _total = await search_cities(
+                lat=point.lat,
+                lon=point.lon,
+                distance=25,
+                limit=1,
+            )
+        except Exception as exception:
+            await context.abort(grpc.StatusCode.INTERNAL, str(exception))
+        if cities:
+            city_id = cities[0][0]
+            city_point_dict = cities[0][1]
         document = {
             'city_point': city_point_dict,
             'user_point': user_point_dict,
