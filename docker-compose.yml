@@ -279,23 +279,23 @@ services:
   #     - external_network
 
 networks:
-  accounts_network:
-    driver: bridge
-  bot_network:
-    driver: bridge
-  profiles_network:
-    driver: bridge
-  recommendations_network:
-    driver: bridge
+  # accounts_network:
+  #   driver: bridge
+  # bot_network:
+  #   driver: bridge
+  # profiles_network:
+  #   driver: bridge
+  # recommendations_network:
+  #   driver: bridge
   external_network:
     driver: bridge
 
 volumes:
-  accounts_pgdata:
-  profiles_pgdata:
+  # accounts_pgdata:
+  # profiles_pgdata:
   rabbitmq_data:
-  minio_data:
-  elasticsearch_data:
-  redis_data:
+  # minio_data:
+  # elasticsearch_data:
+  # redis_data:
   clickhouse_data:
 

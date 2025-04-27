@@ -26,6 +26,12 @@
       "vhost": "/",
       "type": "fanout",
       "durable": true
+    },
+    {
+      "name": "mutual_likes_exchange",
+      "vhost": "/",
+      "type": "fanout",
+      "durable": true
     }
   ],
   "queues": [
@@ -36,6 +42,11 @@
     },
     {
       "name": "clickhouse_queue",
+      "vhost": "/",
+      "durable": true
+    },
+    {
+      "name": "mutual_likes_queue",
       "vhost": "/",
       "durable": true
     }
@@ -52,6 +63,13 @@
       "source": "interactions_exchange",
       "vhost": "/",
       "destination": "clickhouse_queue",
+      "destination_type": "queue",
+      "routing_key": ""
+    },
+    {
+      "source": "mutual_likes_exchange",
+      "vhost": "/",
+      "destination": "mutual_likes_queue",
       "destination_type": "queue",
       "routing_key": ""
     }

@@ -1,10 +1,12 @@
 import asyncio
+import contextlib
 import clickhouse_connect
 import grpc
 from concurrent import futures
 import proto.clickhouse_pb2 as clickhouse_pb2
 import proto.clickhouse_pb2_grpc as clickhouse_pb2_grpc
 from datetime import datetime
+import mutual
 
 class ClickHouseServicer(clickhouse_pb2_grpc.ClickHouseServiceServicer):
     def __init__(self):
@@ -85,7 +87,16 @@ async def serve():
     server.add_insecure_port('[::]:1337')
     await server.start()
     print("Server started on port 1337")
+
+    # start mutual-like background worker
+    worker_task = asyncio.create_task(mutual.start_mutual_worker())
+
     await server.wait_for_termination()
+
+    # gracefully cancel the worker on shutdown
+    worker_task.cancel()
+    with contextlib.suppress(asyncio.CancelledError):
+        await worker_task
 
 if __name__ == "__main__":
     asyncio.run(serve())
