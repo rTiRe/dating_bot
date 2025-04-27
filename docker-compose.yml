@@ -148,47 +148,49 @@ services:
   #     start_period: 60s
   #   restart: unless-stopped
 
-  # accounts_db:
-  #   image: 'postgres:15.5'
-  #   container_name: accounts_db
-  #   environment:
-  #     - POSTGRES_DB=${ACCOUNTS_DB_NAME}
-  #     - POSTGRES_USER=${ACCOUNTS_DB_USER}
-  #     - POSTGRES_PASSWORD=${ACCOUNTS_DB_PASS}
-  #   restart: unless-stopped
-  #   ports:
-  #     - 127.0.0.1:5442:5432
-  #   healthcheck:
-  #     test: [ "CMD", "pg_isready", "-d", "test", "-U", "${ACCOUNTS_DB_USER}" ]
-  #     interval: 5s
-  #     timeout: 5s
-  #     retries: 3
-  #     start_period: 5s
-  #   volumes:
-  #     - accounts_pgdata:/var/lib/postgresql/data
-  #   networks:
-  #     - accounts_network
+  accounts_db:
+    image: 'postgres:15.5'
+    container_name: accounts_db
+    environment:
+      - POSTGRES_DB=${ACCOUNTS_DB_NAME}
+      - POSTGRES_USER=${ACCOUNTS_DB_USER}
+      - POSTGRES_PASSWORD=${ACCOUNTS_DB_PASS}
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:5442:5432
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-d", "test", "-U", "${ACCOUNTS_DB_USER}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    volumes:
+      - accounts_pgdata:/var/lib/postgresql/data
+    networks:
+      - accounts_network
 
-  # accounts_service:
-  #   build: ./accounts_service
-  #   container_name: accounts_service
-  #   command: bash -c "poetry run yoyo apply -b && poetry run python -m src"
-  #   stop_signal: SIGINT
-  #   restart: unless-stopped
-  #   depends_on:
-  #     accounts_db:
-  #       condition: service_healthy
-  #   env_file:
-  #     - accounts_service/config/.env
-  #   volumes:
-  #     - ./accounts_service:/usr/src/dating/accounts_service
-  #   ports:
-  #     - "8001:8001"
-  #     - "8010:1337"
-  #   networks:
-  #     - accounts_network
-  #     - profiles_network
-  #     - external_network
+  accounts_service:
+    build: ./accounts_service
+    container_name: accounts_service
+    command: sh -c "poetry run yoyo apply -b && poetry run python -m src"
+    stop_signal: SIGINT
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgres://test:test@accounts_db:5432/test
+    depends_on:
+      accounts_db:
+        condition: service_healthy
+    # env_file:
+    #   - accounts_service/config/.env
+    volumes:
+      - ./accounts_service:/usr/src/dating/accounts_service
+    ports:
+      - "8001:8001"
+      - "8010:1337"
+    networks:
+      - accounts_network
+      - profiles_network
+      - external_network
 
   # profiles_db:
   #   image: 'postgres:15.5'
@@ -279,23 +281,24 @@ services:
   #     - external_network
 
 networks:
-  # accounts_network:
-  #   driver: bridge
-  # bot_network:
-  #   driver: bridge
-  # profiles_network:
-  #   driver: bridge
-  # recommendations_network:
-  #   driver: bridge
+  accounts_network:
+    driver: bridge
+  bot_network:
+    driver: bridge
+  profiles_network:
+    driver: bridge
+  recommendations_network:
+    driver: bridge
   external_network:
     driver: bridge
 
 volumes:
-  # accounts_pgdata:
-  # profiles_pgdata:
+  accounts_pgdata:
+  profiles_pgdata:
   rabbitmq_data:
-  # minio_data:
-  # elasticsearch_data:
-  # redis_data:
+  minio_data:
+  elasticsearch_data:
+  redis_data:
   clickhouse_data:
+
 
