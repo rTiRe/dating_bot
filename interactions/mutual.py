@@ -1,4 +1,3 @@
-
 import asyncio
 import json
 from aio_pika import connect_robust, Message, DeliveryMode, ExchangeType # type: ignore
@@ -48,7 +47,7 @@ async def start_mutual_worker():
         await ch.command(
             f"ALTER TABLE dating.mutual_likes_log "
             f"UPDATE sent = 1 "
-            f"WHERE liker1={liker1} AND liker2={liker2} "
+            f"WHERE liker1 = '{liker1}' AND liker2 = '{liker2}' "
         )
 
 

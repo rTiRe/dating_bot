@@ -4,15 +4,15 @@ USE dating;
 -- Итоговая таблица с автоматическим заполнением времени
 CREATE TABLE IF NOT EXISTS interactions (
     `timestamp`       DateTime    DEFAULT now(),   -- по умолчанию текущее время
-    `liker_id`        UInt32,
-    `liked_id`        UInt32,
+    `liker_id`        String,
+    `liked_id`        String,
     `interaction_type` String
 ) ENGINE = Memory;
 
 -- Источник из RabbitMQ без поля timestamp
 CREATE TABLE IF NOT EXISTS rabbitmq_entry (
-    liker_id          UInt32,
-    liked_id          UInt32,
+    liker_id          String,
+    liked_id          String,
     interaction_type  String
 ) ENGINE = RabbitMQ
 SETTINGS
@@ -37,8 +37,8 @@ FROM rabbitmq_entry;
 
 -- Таблица для логирования взаимных лайков и пометки отправленных
 CREATE TABLE IF NOT EXISTS mutual_likes_log (
-    liker1     UInt32,
-    liker2     UInt32,
+    liker1     String,
+    liker2     String,
     event_time DateTime,
     sent       UInt8     DEFAULT 0
 ) ENGINE = ReplacingMergeTree()
