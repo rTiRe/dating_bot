@@ -44,6 +44,11 @@ class ProfilesServiceStub(object):
                 request_serializer=profiles__pb2.ProfilesGetRequest.SerializeToString,
                 response_deserializer=profiles__pb2.ProfilesGetResponse.FromString,
                 _registered_method=True)
+        self.GetList = channel.unary_unary(
+                '/dating.service.profiles.ProfilesService/GetList',
+                request_serializer=profiles__pb2.ProfilesGetListRequest.SerializeToString,
+                response_deserializer=profiles__pb2.ProfilesGetListResponse.FromString,
+                _registered_method=True)
         self.Update = channel.unary_unary(
                 '/dating.service.profiles.ProfilesService/Update',
                 request_serializer=profiles__pb2.ProfileUpdateRequest.SerializeToString,
@@ -66,6 +71,12 @@ class ProfilesServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def Get(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetList(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -95,6 +106,11 @@ def add_ProfilesServiceServicer_to_server(servicer, server):
                     servicer.Get,
                     request_deserializer=profiles__pb2.ProfilesGetRequest.FromString,
                     response_serializer=profiles__pb2.ProfilesGetResponse.SerializeToString,
+            ),
+            'GetList': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetList,
+                    request_deserializer=profiles__pb2.ProfilesGetListRequest.FromString,
+                    response_serializer=profiles__pb2.ProfilesGetListResponse.SerializeToString,
             ),
             'Update': grpc.unary_unary_rpc_method_handler(
                     servicer.Update,
@@ -161,6 +177,33 @@ class ProfilesService(object):
             '/dating.service.profiles.ProfilesService/Get',
             profiles__pb2.ProfilesGetRequest.SerializeToString,
             profiles__pb2.ProfilesGetResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetList(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/dating.service.profiles.ProfilesService/GetList',
+            profiles__pb2.ProfilesGetListRequest.SerializeToString,
+            profiles__pb2.ProfilesGetListResponse.FromString,
             options,
             channel_credentials,
             insecure,

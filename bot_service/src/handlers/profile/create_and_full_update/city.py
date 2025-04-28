@@ -3,6 +3,7 @@ from base64 import b64encode
 from aiogram import F, types
 from aiogram.fsm.context import FSMContext
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.utils.i18n import lazy_gettext as _
 
 from src.handlers.profile.create_and_full_update.router import router
 from src.templates import render
@@ -12,10 +13,12 @@ from src.states import ProfileCreationStates
 async def city(
     message: types.Message,
     state: FSMContext,
-    album: list[types.Message] = [],
+    album: list[types.Message] = None,
 ) -> types.Message:
+    if not album:
+        album = []
     if len(album) > 3:
-        return await message.answer('К сожалению я не могу сохранить все твои фото, отправь только 3 самых лучших')
+        return await message.answer(str(_('К сожалению я не могу сохранить все твои фото, отправь только 3 самых лучших')))
     if not album:
         album.append(message)
     photos = {}
@@ -26,15 +29,15 @@ async def city(
         photos[photo_id] = b64encode(photo_bytes.read()).decode()
     await state.update_data(photos=photos)
     bot_message = await message.answer(
-        await render('profile/create/5_city'),
+        await render('profile/create/5_city', language_code=message.from_user.language_code),
         reply_markup=ReplyKeyboardMarkup(
             keyboard=[
-                [KeyboardButton(text='Отправить координаты', request_location=True)],
+                [KeyboardButton(text=str(_('Отправить координаты')), request_location=True)],
             ],
             is_persistent=True,
             resize_keyboard=True,
             one_time_keyboard=True,
-            input_field_placeholder='Мой город...',
+            input_field_placeholder=str(_('Мой город...')),
         ),
     )
     await state.set_state(ProfileCreationStates.city)
@@ -43,4 +46,4 @@ async def city(
 
 @router.message(ProfileCreationStates.photo)
 async def city_error(message: types.Message) -> types.Message:
-    return await message.answer('Нет-нет, мне нужно твое фото')
+    return await message.answer(str(_('Нет-нет, мне нужно твое фото')))

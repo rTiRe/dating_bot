@@ -5,34 +5,71 @@ package dating.service.recommendations;
 import "profiles.proto";
 
 service RecommendationsService {
-    rpc GetMatches(RecommendationsGetMatchRequest) returns (RecommendationsGetMatchResponse);
-    rpc UpdateUser(RecommendationsUpdateUserRequest) returns (RecommendationsUpdateUserResponse);
+    rpc UpdateProfile(RecommendationsUpdateProfileRequest) returns (RecommendationsUpdateProfileResponse);
+    rpc SearchProfiles(RecommendationsSearchProfilesRequest) returns (RecommendationsSearchProfilesResponse);
+    rpc UpdateCity(RecommendationsUpdateCityRequest) returns (RecommendationsUpdateCityResponse);
+    rpc SearchCities(RecommendationsSearchCitiesRequest) returns (RecommendationsSearchCitiesResponse);
 }
 
-message RecommendationsGetMatchRequest {
+message RecommendationsSearchProfilesRequest {
     float lat = 1;
     float lon = 2;
     profiles.Gender gender = 3;
-    int32 age_min = 4;
-    int32 age_max = 5;
-    int32 distance = 6;
-    int32 limit = 7;
+    int32 age = 4;
+    int32 distance = 5;
+    int32 limit = 6;
+    string prefer = 7;
+    string searcher_id = 8;
 }
 
-message RecommendationsGetMatchResponse {
-    repeated string user_ids = 1;
+message RecommendationsSearchProfilesResponse {
+    repeated string profile_ids = 1;
     int32 total = 2;
 }
 
-message RecommendationsUpdateUserRequest {
-    string user_id = 1;
-    float lat = 2;
-    float lon = 3;
-    int32 age = 4;
-    string gender = 5;
+message RecommendationsUpdateProfileRequest {
+    string profile_id = 1;
+    int32 age = 2;
+    profiles.Gender gender = 3;
+    oneof coordinates {
+        profiles.CityPoint city_point = 4;
+        profiles.UserPoint user_point = 5;
+    }
+    int32 description_len = 6;
+    int32 photo_count = 7;
 }
 
-message RecommendationsUpdateUserResponse {
-    string user_id = 1;
-    bool created = 2;
+message RecommendationsUpdateProfileResponse {
+    string profile_id = 1;
+    int32 age = 2;
+    profiles.Gender gender = 3;
+    optional string city_id = 4;
+    optional profiles.CityPoint city_point = 5;
+    optional profiles.UserPoint user_point = 6;
+    string result = 7;
+}
+
+message RecommendationsUpdateCityRequest {
+    string city_id = 1;
+    float lat = 2;
+    float lon = 3;
+}
+
+message RecommendationsUpdateCityResponse {
+    string city_id = 1;
+    float lat = 2;
+    float lon = 3;
+    string result = 4;
+}
+
+message RecommendationsSearchCitiesRequest {
+    float lat = 1;
+    float lon = 2;
+    float distance = 3;
+    int32 limit = 4;
+}
+
+message RecommendationsSearchCitiesResponse {
+    repeated string city_ids = 1;
+    int32 total = 2;
 }

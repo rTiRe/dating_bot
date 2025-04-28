@@ -124,6 +124,9 @@ services:
     restart: unless-stopped
     tty: true
     stdin_open: true
+    networks:
+      - bot_network
+      - external_network
 
 
   elasticsearch:
@@ -134,6 +137,9 @@ services:
       - ELASTIC_PASSWORD=${ELASTICSEARCH_PASS}
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - cluster.name=docker-cluster
+      - http.cors.enabled=true
+      - http.cors.allow-origin="*"
+      - xpack.security.enabled=false
     ports:
       - "9200:9200"
     volumes:

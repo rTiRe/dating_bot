@@ -1,5 +1,13 @@
+{% if language_code == 'ru' %}
 {% if first_meet %}
 Кажется, мы видимся впервые 🤔
 Давай создадим твой профиль для знакомств. Это займет всего пару минут!
 {% endif %}
 Как тебя зовут? 😊
+{% else %}
+{% if first_meet %}
+I think this is our first time seeing each other 🤔
+Let's create your dating profile. It'll only take a couple of minutes!
+{% endif %}
+What's your name? 😊
+{% endif %}

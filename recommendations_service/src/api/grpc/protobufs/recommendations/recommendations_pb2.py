@@ -25,21 +25,29 @@ _sym_db = _symbol_database.Default()
 from ..profiles import profiles_pb2 as profiles__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15recommendations.proto\x12\x1e\x64\x61ting.service.recommendations\x1a\x0eprofiles.proto\"\xae\x01\n\x1eRecommendationsGetMatchRequest\x12\x0b\n\x03lat\x18\x01 \x01(\x02\x12\x0b\n\x03lon\x18\x02 \x01(\x02\x12/\n\x06gender\x18\x03 \x01(\x0e\x32\x1f.dating.service.profiles.Gender\x12\x0f\n\x07\x61ge_min\x18\x04 \x01(\x05\x12\x0f\n\x07\x61ge_max\x18\x05 \x01(\x05\x12\x10\n\x08\x64istance\x18\x06 \x01(\x05\x12\r\n\x05limit\x18\x07 \x01(\x05\"B\n\x1fRecommendationsGetMatchResponse\x12\x10\n\x08user_ids\x18\x01 \x03(\t\x12\r\n\x05total\x18\x02 \x01(\x05\"j\n RecommendationsUpdateUserRequest\x12\x0f\n\x07user_id\x18\x01 \x01(\t\x12\x0b\n\x03lat\x18\x02 \x01(\x02\x12\x0b\n\x03lon\x18\x03 \x01(\x02\x12\x0b\n\x03\x61ge\x18\x04 \x01(\x05\x12\x0e\n\x06gender\x18\x05 \x01(\t\"E\n!RecommendationsUpdateUserResponse\x12\x0f\n\x07user_id\x18\x01 \x01(\t\x12\x0f\n\x07\x63reated\x18\x02 \x01(\x08\x32\xbc\x02\n\x16RecommendationsService\x12\x8d\x01\n\nGetMatches\x12>.dating.service.recommendations.RecommendationsGetMatchRequest\x1a?.dating.service.recommendations.RecommendationsGetMatchResponse\x12\x91\x01\n\nUpdateUser\x12@.dating.service.recommendations.RecommendationsUpdateUserRequest\x1a\x41.dating.service.recommendations.RecommendationsUpdateUserResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15recommendations.proto\x12\x1e\x64\x61ting.service.recommendations\x1a\x0eprofiles.proto\"\xc4\x01\n$RecommendationsSearchProfilesRequest\x12\x0b\n\x03lat\x18\x01 \x01(\x02\x12\x0b\n\x03lon\x18\x02 \x01(\x02\x12/\n\x06gender\x18\x03 \x01(\x0e\x32\x1f.dating.service.profiles.Gender\x12\x0b\n\x03\x61ge\x18\x04 \x01(\x05\x12\x10\n\x08\x64istance\x18\x05 \x01(\x05\x12\r\n\x05limit\x18\x06 \x01(\x05\x12\x0e\n\x06prefer\x18\x07 \x01(\t\x12\x13\n\x0bsearcher_id\x18\x08 \x01(\t\"K\n%RecommendationsSearchProfilesResponse\x12\x13\n\x0bprofile_ids\x18\x01 \x03(\t\x12\r\n\x05total\x18\x02 \x01(\x05\"\xa8\x02\n#RecommendationsUpdateProfileRequest\x12\x12\n\nprofile_id\x18\x01 \x01(\t\x12\x0b\n\x03\x61ge\x18\x02 \x01(\x05\x12/\n\x06gender\x18\x03 \x01(\x0e\x32\x1f.dating.service.profiles.Gender\x12\x38\n\ncity_point\x18\x04 \x01(\x0b\x32\".dating.service.profiles.CityPointH\x00\x12\x38\n\nuser_point\x18\x05 \x01(\x0b\x32\".dating.service.profiles.UserPointH\x00\x12\x17\n\x0f\x64\x65scription_len\x18\x06 \x01(\x05\x12\x13\n\x0bphoto_count\x18\x07 \x01(\x05\x42\r\n\x0b\x63oordinates\"\xc2\x02\n$RecommendationsUpdateProfileResponse\x12\x12\n\nprofile_id\x18\x01 \x01(\t\x12\x0b\n\x03\x61ge\x18\x02 \x01(\x05\x12/\n\x06gender\x18\x03 \x01(\x0e\x32\x1f.dating.service.profiles.Gender\x12\x14\n\x07\x63ity_id\x18\x04 \x01(\tH\x00\x88\x01\x01\x12;\n\ncity_point\x18\x05 \x01(\x0b\x32\".dating.service.profiles.CityPointH\x01\x88\x01\x01\x12;\n\nuser_point\x18\x06 \x01(\x0b\x32\".dating.service.profiles.UserPointH\x02\x88\x01\x01\x12\x0e\n\x06result\x18\x07 \x01(\tB\n\n\x08_city_idB\r\n\x0b_city_pointB\r\n\x0b_user_point\"M\n RecommendationsUpdateCityRequest\x12\x0f\n\x07\x63ity_id\x18\x01 \x01(\t\x12\x0b\n\x03lat\x18\x02 \x01(\x02\x12\x0b\n\x03lon\x18\x03 \x01(\x02\"^\n!RecommendationsUpdateCityResponse\x12\x0f\n\x07\x63ity_id\x18\x01 \x01(\t\x12\x0b\n\x03lat\x18\x02 \x01(\x02\x12\x0b\n\x03lon\x18\x03 \x01(\x02\x12\x0e\n\x06result\x18\x04 \x01(\t\"_\n\"RecommendationsSearchCitiesRequest\x12\x0b\n\x03lat\x18\x01 \x01(\x02\x12\x0b\n\x03lon\x18\x02 \x01(\x02\x12\x10\n\x08\x64istance\x18\x03 \x01(\x02\x12\r\n\x05limit\x18\x04 \x01(\x05\"F\n#RecommendationsSearchCitiesResponse\x12\x10\n\x08\x63ity_ids\x18\x01 \x03(\t\x12\r\n\x05total\x18\x02 \x01(\x05\x32\x83\x05\n\x16RecommendationsService\x12\x9a\x01\n\rUpdateProfile\x12\x43.dating.service.recommendations.RecommendationsUpdateProfileRequest\x1a\x44.dating.service.recommendations.RecommendationsUpdateProfileResponse\x12\x9d\x01\n\x0eSearchProfiles\x12\x44.dating.service.recommendations.RecommendationsSearchProfilesRequest\x1a\x45.dating.service.recommendations.RecommendationsSearchProfilesResponse\x12\x91\x01\n\nUpdateCity\x12@.dating.service.recommendations.RecommendationsUpdateCityRequest\x1a\x41.dating.service.recommendations.RecommendationsUpdateCityResponse\x12\x97\x01\n\x0cSearchCities\x12\x42.dating.service.recommendations.RecommendationsSearchCitiesRequest\x1a\x43.dating.service.recommendations.RecommendationsSearchCitiesResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'recommendations_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_RECOMMENDATIONSGETMATCHREQUEST']._serialized_start=74
-  _globals['_RECOMMENDATIONSGETMATCHREQUEST']._serialized_end=248
-  _globals['_RECOMMENDATIONSGETMATCHRESPONSE']._serialized_start=250
-  _globals['_RECOMMENDATIONSGETMATCHRESPONSE']._serialized_end=316
-  _globals['_RECOMMENDATIONSUPDATEUSERREQUEST']._serialized_start=318
-  _globals['_RECOMMENDATIONSUPDATEUSERREQUEST']._serialized_end=424
-  _globals['_RECOMMENDATIONSUPDATEUSERRESPONSE']._serialized_start=426
-  _globals['_RECOMMENDATIONSUPDATEUSERRESPONSE']._serialized_end=495
-  _globals['_RECOMMENDATIONSSERVICE']._serialized_start=498
-  _globals['_RECOMMENDATIONSSERVICE']._serialized_end=814
+  _globals['_RECOMMENDATIONSSEARCHPROFILESREQUEST']._serialized_start=74
+  _globals['_RECOMMENDATIONSSEARCHPROFILESREQUEST']._serialized_end=270
+  _globals['_RECOMMENDATIONSSEARCHPROFILESRESPONSE']._serialized_start=272
+  _globals['_RECOMMENDATIONSSEARCHPROFILESRESPONSE']._serialized_end=347
+  _globals['_RECOMMENDATIONSUPDATEPROFILEREQUEST']._serialized_start=350
+  _globals['_RECOMMENDATIONSUPDATEPROFILEREQUEST']._serialized_end=646
+  _globals['_RECOMMENDATIONSUPDATEPROFILERESPONSE']._serialized_start=649
+  _globals['_RECOMMENDATIONSUPDATEPROFILERESPONSE']._serialized_end=971
+  _globals['_RECOMMENDATIONSUPDATECITYREQUEST']._serialized_start=973
+  _globals['_RECOMMENDATIONSUPDATECITYREQUEST']._serialized_end=1050
+  _globals['_RECOMMENDATIONSUPDATECITYRESPONSE']._serialized_start=1052
+  _globals['_RECOMMENDATIONSUPDATECITYRESPONSE']._serialized_end=1146
+  _globals['_RECOMMENDATIONSSEARCHCITIESREQUEST']._serialized_start=1148
+  _globals['_RECOMMENDATIONSSEARCHCITIESREQUEST']._serialized_end=1243
+  _globals['_RECOMMENDATIONSSEARCHCITIESRESPONSE']._serialized_start=1245
+  _globals['_RECOMMENDATIONSSEARCHCITIESRESPONSE']._serialized_end=1315
+  _globals['_RECOMMENDATIONSSERVICE']._serialized_start=1318
+  _globals['_RECOMMENDATIONSSERVICE']._serialized_end=1961
 # @@protoc_insertion_point(module_scope)

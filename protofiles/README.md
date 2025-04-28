@@ -22,6 +22,6 @@ python -m grpc_tools.protoc -I ../protofiles --python_out=src/api/grpc/protobufs
 
 ## Команда для генерации файлов recommendations сервиса:
 
-```interested_in
+```
 python -m grpc_tools.protoc -I ../protofiles --python_out=src/api/grpc/protobufs/recommendations --grpc_python_out=src/api/grpc/protobufs/recommendations --pyi_out=src/api/grpc/protobufs/recommendations ../protofiles/recommendations.proto
 ```

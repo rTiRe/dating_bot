@@ -1,5 +1,13 @@
+{% if language_code == 'ru' %}
 {% if first_meet %}Теперь самое интересное! {% endif %}Напиши пару слов о себе, чтобы другие захотели с тобой познакомиться! ✨
 Пример:
 "Люблю горные походы, смотреть аниме и готовить пиццу. Ищу того, с кем можно обсудить новые сериалы или отправиться в путешествие!"
 
 Подсказка: Можно добавить хобби, цели знакомства, что тебя вдохновляет.
+{% else %}
+{% if first_meet %}Now the fun part! {% endif %}Write a few words about yourself so that others want to get to know you! ✨
+Example:
+"I love mountain hiking, watching anime and making pizza. Looking for someone to discuss new TV series with or go on a trip with!"
+
+Hint: You can add hobbies, goals for meeting people, what inspires you.
+{% endif %}

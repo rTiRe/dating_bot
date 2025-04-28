@@ -1,7 +1,7 @@
 """RabbitMQ Configuration Module."""
+import json
 
 import aio_pika
-import msgpack
 from aio_pika.abc import AbstractRobustConnection
 from aio_pika.pool import Pool
 
@@ -33,7 +33,7 @@ async def get_channel() -> aio_pika.Channel:
 channel_pool: Pool = Pool(get_channel, max_size=10)
 
 
-async def publish_message(routing_key: str, message: dict, **kwargs) -> None:
+async def publish_message(exchange: str, routing_key: str, message: dict, **kwargs) -> None:
     """Publish message to routing key.
 
     Args:
@@ -42,11 +42,37 @@ async def publish_message(routing_key: str, message: dict, **kwargs) -> None:
         kwargs: message parameters
     """
     async with channel_pool.acquire() as channel:
-        await channel.default_exchange.publish(
+        channel: aio_pika.Channel
+        await (await channel.get_exchange(exchange)).publish(
             aio_pika.Message(
-                body=msgpack.packb(message),
+                body=json.dumps(message).encode(),
                 delivery_mode=aio_pika.DeliveryMode.PERSISTENT,
                 **kwargs,
             ),
             routing_key=routing_key,
         )
+
+
+async def publish_like(liker_id: str, liked_id: str) -> None:
+    await publish_message(
+        'interaction_exchange',
+        'clickhouse_queue',
+        {
+            'liker_id': liker_id,
+            'liked_id': liked_id,
+            'interaction_type': 'like',
+        }
+    )
+
+
+async def publish_dislike(liker_id: str, liked_id: str) -> None:
+    await publish_message(
+        'interaction_exchange',
+        'clickhouse_queue',
+        {
+            'liker_id': liker_id,
+            'liked_id': liked_id,
+            'interaction_type': 'dislike',
+        }
+    )
+
