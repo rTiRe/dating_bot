@@ -7,20 +7,22 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class RecommendationsSearchProfilesRequest(_message.Message):
-    __slots__ = ("lat", "lon", "gender", "age", "distance", "limit")
+    __slots__ = ("lat", "lon", "gender", "age", "distance", "limit", "prefer")
     LAT_FIELD_NUMBER: _ClassVar[int]
     LON_FIELD_NUMBER: _ClassVar[int]
     GENDER_FIELD_NUMBER: _ClassVar[int]
     AGE_FIELD_NUMBER: _ClassVar[int]
     DISTANCE_FIELD_NUMBER: _ClassVar[int]
     LIMIT_FIELD_NUMBER: _ClassVar[int]
+    PREFER_FIELD_NUMBER: _ClassVar[int]
     lat: float
     lon: float
     gender: _profiles_pb2.Gender
     age: int
     distance: int
     limit: int
-    def __init__(self, lat: _Optional[float] = ..., lon: _Optional[float] = ..., gender: _Optional[_Union[_profiles_pb2.Gender, str]] = ..., age: _Optional[int] = ..., distance: _Optional[int] = ..., limit: _Optional[int] = ...) -> None: ...
+    prefer: str
+    def __init__(self, lat: _Optional[float] = ..., lon: _Optional[float] = ..., gender: _Optional[_Union[_profiles_pb2.Gender, str]] = ..., age: _Optional[int] = ..., distance: _Optional[int] = ..., limit: _Optional[int] = ..., prefer: _Optional[str] = ...) -> None: ...
 
 class RecommendationsSearchProfilesResponse(_message.Message):
     __slots__ = ("profile_ids", "total")

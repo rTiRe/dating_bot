@@ -1,16 +1,24 @@
 from src.storage.elasticsearch import database
 
 async def search_profiles(
-    city_point: dict[str, float],
+    point: dict[str, float],
     age: int,
     gender: int,
-    radius_km: int = 25,
+    distance: int = 25,
+    prefer: str = 'city',
+    limit: int = 10,
 ) -> tuple[list[str], int]:
     gender_must = []
     if gender == 1:
         gender_must = [{'term': {'gender': 1}}]
     elif gender == 2:
         gender_must = [{'term': {'gender': 2}}]
+    if prefer == 'city':
+        main_point_field = 'city_point'
+        secondary_point_field = 'user_point'
+    else:
+        main_point_field = 'user_point'
+        secondary_point_field = 'city_point'
     query = {
         'query': {
             'function_score': {
@@ -20,23 +28,53 @@ async def search_profiles(
                             {'range': {'age': {'gte': age-2, 'lte': age+2}}},
                             *gender_must,
                         ],
-                        'filter': [{'geo_distance': {
-                            'distance': f'{radius_km}km',
-                            'city_point': city_point,
+                        'filter': [{'bool': {
+                            'should': [
+                                {'geo_distance': {
+                                    'distance': f'{distance}km',
+                                    main_point_field: point,
+                                }},
+                                {'geo_distance': {
+                                    'distance': f'{distance}km',
+                                    secondary_point_field: point,
+                                }},
+                            ],
+                            'minimum_should_match': 1,
                         }}],
                     }
                 },
                 'functions': [
                     {
+                        'filter': {
+                            'exists': {
+                                'field': main_point_field,
+                            }
+                        },
                         'gauss': {
-                            'city_point': {
-                                'origin': city_point,
-                                'scale': f'{radius_km / 2.2}km',
+                            main_point_field: {
+                                'origin': point,
+                                'scale': f'{distance / 2.2}km',
                                 'offset': '500m',
                                 'decay': 0.5,
                             },
                         },
-                        'weight': 100,
+                        'weight': 55 if prefer == 'user' else 100,
+                    },
+                    {
+                        'filter': {
+                            'exists': {
+                                'field': secondary_point_field,
+                            }
+                        },
+                        'gauss': {
+                            secondary_point_field: {
+                                'origin': point,
+                                'scale': f'{distance / 2.2}km',
+                                'offset': '500m',
+                                'decay': 0.5,
+                            },
+                        },
+                        'weight': 45 if prefer == 'user' else 0,
                     },
                     {
                         'gauss': {
@@ -51,17 +89,16 @@ async def search_profiles(
                     },
                     {
                         'field_value_factor': {
-                            'field': 'points',
-                            'factor': 0.1,
-                            'modifier': 'sqrt',
-                            'missing': 0,
+                            'field': 'rating',
+                            'factor': 1.0,
+                            'modifier': 'none',
                         },
                         'weight': 1,
                     },
-                    # {
-                    #     'random_score': {},
-                    #     'weight': 20,
-                    # },
+                    {
+                        'random_score': {},
+                        'weight': 30,
+                    },
                 ],
                 'score_mode': 'sum',
                 'boost_mode': 'multiply',
@@ -71,7 +108,7 @@ async def search_profiles(
     search_response = await database.elasticsearch.search(
         index='profiles',
         body=query,
-        size=100
+        size=limit,
     )
     hits = search_response['hits']['hits']
     print(hits, flush=True)

@@ -22,9 +22,12 @@ class RecommendationsService(recommendations_pb2_grpc.RecommendationsServiceServ
     ) -> recommendations_pb2.RecommendationsSearchProfilesResponse:
         try:
             profile_ids, total = await search_profiles(
-                {'lat': request.lat, 'lon': request.lon},
+                point={'lat': request.lat, 'lon': request.lon},
                 age=request.age,
                 gender=request.gender,
+                distance=request.distance,
+                prefer=request.prefer,
+                limit=request.limit,
             )
         except Exception as exception:
             await context.abort(grpc.StatusCode.INTERNAL, str(exception))
@@ -66,8 +69,7 @@ class RecommendationsService(recommendations_pb2_grpc.RecommendationsServiceServ
             'user_point': user_point_dict,
             'age': request.age,
             'gender': request.gender,
-            'description_len': request.description_len,
-            'photo_count': request.photo_count,
+            'rating': int(request.description_len > 0) * 20 + request.photo_count * 10,
         }
         try:
             profile_response = await database.elasticsearch.index(

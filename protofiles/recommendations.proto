@@ -15,10 +15,10 @@ message RecommendationsSearchProfilesRequest {
     float lat = 1;
     float lon = 2;
     profiles.Gender gender = 3;
-    int32 age_min = 4;
-    int32 age_max = 5;
-    int32 distance = 6;
-    int32 limit = 7;
+    int32 age = 4;
+    int32 distance = 5;
+    int32 limit = 6;
+    string prefer = 7;
 }
 
 message RecommendationsSearchProfilesResponse {
