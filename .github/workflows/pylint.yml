@@ -32,11 +32,14 @@ jobs:
         uses: appleboy/ssh-action@v1    # SSH-Action для GitHub Actions :contentReference[oaicite:0]{index=0}
         with:
           # host: ${{ secrets.SSH_HOST }}       # IP или домен сервера
-          host:
-          username: ${{ secrets.SSH_USER }}   # SSH-юзер
-          key: ${{ secrets.SSH_PRIVATE_KEY }} # приватный ключ
+          host: 91.200.148.246
+          # username: ${{ secrets.SSH_USER }}   # SSH-юзер
+          username: root
+          # key: ${{ secrets.SSH_PRIVATE_KEY }} # приватный ключ
+          key: fimoz
           port: 22
           script: |
-            cd /path/to/your/project         # путь на сервере
-            git pull origin main             # подтягиваем свежий код
+            cd /root/dating_bot         # путь на сервере
+            git pull           # подтягиваем свежий код
+            cat .env.example > .env         # создаём .env из .env.example
             docker compose up -d --build     # деплой через Docker Compose

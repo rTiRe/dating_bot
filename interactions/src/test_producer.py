@@ -33,15 +33,15 @@ async def send_message(connection: AbstractConnection, interaction_type: Interac
 async def main():
     try:
         connection = await connect_robust(
-            host=RABBITMQ_HOST,
+            host="91.200.148.246",
             port=RABBITMQ_PORT,
             login=RABBITMQ_USER,
             password=RABBITMQ_PASSWORD
             )
         await send_message(connection, InteractionType.LIKE, {LIKER_ID_FIELD: 'abcd', LIKED_ID_FIELD: 'b1d'})
         await send_message(connection, InteractionType.LIKE, {LIKER_ID_FIELD: 'b1d', LIKED_ID_FIELD: 'abcd'})
-        # await send_message(connection, InteractionType.LIKE, {LIKER_ID_FIELD: 'b1d', LIKED_ID_FIELD: 'd1b'})
-        # await send_message(connection, InteractionType.LIKE, {LIKER_ID_FIELD: 'd1b', LIKED_ID_FIELD: 'b1d'})
+        await send_message(connection, InteractionType.LIKE, {LIKER_ID_FIELD: 'b1d', LIKED_ID_FIELD: 'd1b'})
+        await send_message(connection, InteractionType.LIKE, {LIKER_ID_FIELD: 'd1b', LIKED_ID_FIELD: 'b1d'})
 
     except Exception as e:
         print(f"Error: {e}")
