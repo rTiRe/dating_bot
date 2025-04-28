@@ -4,7 +4,6 @@ from time import time
 from aiogram import F, types
 from aiogram.utils.media_group import MediaGroupBuilder
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import default_state
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from grpc import RpcError, StatusCode
 
@@ -22,7 +21,7 @@ async def menu(
     message: types.Message,
     state: FSMContext,
 ) -> tuple[types.Message, types.Message, types.Message] | types.Message:
-    await state.set_state(default_state)
+    await state.set_state(MainStates.default)
     state_data = await state.get_data()
     account_id = state_data.get(
         'account_id',
@@ -40,7 +39,21 @@ async def menu(
     if not profile_data:
         return await name(message, state)
     else:
-        await state.update_data(profile_id=profile_data.id)
+        await state.update_data(
+            profile_id=profile_data.id,
+            profile_search_data={
+                'age': profile_data.age,
+                'gender': profile_data.gender,
+                'city_point': {
+                    'lat': profile_data.city_point.lat,
+                    'lon': profile_data.city_point.lon,
+                } if profile_data.HasField('city_point') else {},
+                'user_point': {
+                    'lat': profile_data.user_point.lat,
+                    'lon': profile_data.user_point.lon,
+                } if profile_data.HasField('user_point') else {},
+            }
+        )
     introduce_message = await message.answer(
         'Так выглядит твоя анкета:',
         reply_markup=ReplyKeyboardRemove(),
@@ -49,8 +62,8 @@ async def menu(
         'profile/profile',
         name=profile_data.name,
         age=profile_data.age,
-        # city_location=profile_data['city_location'],
-        # user_location=profile_data['user_location'],
+        city_location=profile_data.city_point if profile_data.HasField('city_point') else None,
+        user_location=profile_data.user_point if profile_data.HasField('user_point') else None,
         description=profile_data.biography,
     )
     if len(profile_data.image_base64_list) == 1:

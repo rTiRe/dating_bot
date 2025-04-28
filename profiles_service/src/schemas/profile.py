@@ -41,8 +41,8 @@ class ProfileSchema(BaseModel):
     lon: float | None = None
     rating: int
     interested_in: Annotated[GenderEnum | int, AfterValidator(check_gender)]
-    city_id: UUID
-    city_name: str
+    city_id: UUID | None = None
+    city_name: str | None = None
 
 
 class CreateProfileSchema(BaseModel):

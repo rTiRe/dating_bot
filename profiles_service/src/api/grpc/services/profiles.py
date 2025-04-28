@@ -129,19 +129,27 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             interested_in=request.interested_in,
             city_name=request.city_point.name,
         )
+        city = None
         async with database.pool.acquire() as connection:
-            if request.city_point:
-                create_city_schema = CreateCitySchema(lat=request.city_point.lat, lon=request.city_point.lon)
-                try:
-                    city = await CitiesRepository.create(connection, create_city_schema)
-                except UniqueViolationError:
-                    await context.abort(grpc.StatusCode.ALREADY_EXISTS)
-                create_profile_schema.city_id = city.id
-                try:
-                    await recommendations_connection.update_city(city_id=city.id, lat=city.lat, lon=city.lon)
-                except Exception as e:
-                    print(str(e), flush=True)
-                    await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(e))
+            if request.HasField('city_point'):
+                lat_spec = EqualsSpecification('lat', request.city_point.lat)
+                lon_spec = EqualsSpecification('lon', request.city_point.lon)
+                cities = await CitiesRepository.get(connection, lat_spec, lon_spec)
+                if len(cities) == 0:
+                    create_city_schema = CreateCitySchema(lat=request.city_point.lat, lon=request.city_point.lon)
+                    try:
+                        city = await CitiesRepository.create(connection, create_city_schema)
+                    except UniqueViolationError:
+                        await context.abort(grpc.StatusCode.ALREADY_EXISTS)
+                else:
+                    city = cities[0]
+                if city:
+                    create_profile_schema.city_id = city.id
+                    try:
+                        await recommendations_connection.update_city(city_id=city.id, lat=city.lat, lon=city.lon)
+                    except Exception as e:
+                        print(str(e), flush=True)
+                        await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(e))
             try:
                 profile = await ProfilesRepository.create(connection, create_profile_schema)
             except UniqueViolationError:
@@ -150,8 +158,8 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
                 profile_id=profile.id,
                 age=profile.age,
                 gender=profile.gender.name,
-                city_point=CityPoint(name=profile.city_name, lat=city.lat, lon=city.lon),
-                user_point=UserPoint(lat=profile.lat, lon=profile.lon),
+                city_point=CityPoint(name=profile.city_name, lat=city.lat, lon=city.lon) if city else None,
+                user_point=UserPoint(lat=profile.lat, lon=profile.lon) if profile.lat and profile.lon else None,
                 description_len=len(profile.biography),
                 photo_count=len(profile.image_names),
             )
@@ -177,7 +185,7 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             updated_at=profile.updated_at.isoformat(),
             rating=profile.rating,
             interested_in=profile.interested_in.name,
-            city_point=CityPoint(lat=city.lat, lon=city.lon, name=profile.city_name),
+            city_point=CityPoint(lat=city.lat, lon=city.lon, name=profile.city_name) if city else None,
         )
 
 
@@ -197,16 +205,18 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
         except ValueError as exception:
             await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
         specification = EqualsSpecification(profile_identifier, getattr(request, profile_identifier))
+        city = None
         async with database.pool.acquire() as connection:
             profiles = (await ProfilesRepository.get(connection, specification))
             if len(profiles) == 0:
                 await context.abort(grpc.StatusCode.NOT_FOUND, f'Profile {getattr(request, profile_identifier)} was not found')
             profile = profiles[0]
-            city_specification = EqualsSpecification('id', str(profile.city_id))
-            cities = (await CitiesRepository.get(connection, city_specification))
-            if len(cities) == 0:
-                await context.abort(grpc.StatusCode.NOT_FOUND, f'City {profile.id} was not found')
-            city = cities[0]
+            if profile.city_id:
+                city_specification = EqualsSpecification('id', str(profile.city_id))
+                cities = (await CitiesRepository.get(connection, city_specification))
+                if len(cities) == 0:
+                    await context.abort(grpc.StatusCode.NOT_FOUND, f'City {profile.id} was not found')
+                city = cities[0]
         if not profile.image_names:
             profile.image_names.append(f'{minio_instance.default_name}{minio_instance.file_format}')
         image_base64_list = [await ProfilesRepository.download_image(minio_instance, image_name) for image_name in profile.image_names]
@@ -223,8 +233,8 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             image_base64_list=image_base64_list,
             rating=profile.rating,
             interested_in=profile.interested_in.name,
-            city_point=CityPoint(lat=city.lat, lon=city.lon, name=profile.city_name),
-            user_point=UserPoint(lat=profile.lat, lon=profile.lon),
+            city_point=CityPoint(lat=city.lat, lon=city.lon, name=profile.city_name) if city else None,
+            user_point=UserPoint(lat=profile.lat, lon=profile.lon) if profile.lat and profile.lon else None,
         )
 
     async def GetList(
@@ -307,23 +317,24 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
         async with database.pool.acquire() as connection:
             cities = await CitiesRepository.get(connection, lat_spec, lon_spec)
             profile = (await ProfilesRepository.get(connection, profile_spec))[0]
-        if len(cities) == 0:
-            create_city_schema = CreateCitySchema(lat=request.data.city_point.lat, lon=request.data.city_point.lon)
-            city = await CitiesRepository.create(connection, create_city_schema)
-            await recommendations_connection.update_city(city_id=city.id, lat=city.lat, lon=city.lon)
+            if len(cities) == 0:
+                create_city_schema = CreateCitySchema(lat=request.data.city_point.lat, lon=request.data.city_point.lon)
+                city = await CitiesRepository.create(connection, create_city_schema)
+                await recommendations_connection.update_city(city_id=city.id, lat=city.lat, lon=city.lon)
         photo_count = len(request.data.biography) if update_data.get('biography') else len(profile.image_names)
         description_len = len(request.data.image_base64_list) if update_data.get('image_base64_list') else len(profile.biography)
         profile_response = await recommendations_connection.update_profile(
             profile_id=profile.id,
             age=request.data.age,
             gender=request.data.gender,
-            city_point=request.data.city_point,
-            user_point=request.data.user_point,
+            city_point=request.data.city_point if request.data.HasField('city_point') else None,
+            user_point=request.data.user_point if request.data.HasField('user_point') else None,
             description_len=description_len,
             photo_count=photo_count,
         )
         if profile_response.HasField('city_id'):
-            update_data['city_id'] = profile_response.city_id
+            update_data['city_name'] = request.data.city_point.name
+            update_data['city_id'] = profile_response.city_id if profile_response.city_id else None
         if profile_response.HasField('user_point'):
             update_data['lat'] = request.data.user_point.lat
             update_data['lon'] = request.data.user_point.lon

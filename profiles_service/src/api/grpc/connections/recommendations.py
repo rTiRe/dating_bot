@@ -51,7 +51,7 @@ class RecommendationsConnection(BaseConnection):
     ) -> recommendations_pb2.RecommendationsUpdateCityResponse:
         if city_id and not isinstance(city_id, UUID):
             city_id = str(UUID(city_id))  # noqa: WPS125
-        update_request = recommendations_pb2.RecommendationsUpdateCityResponse(
+        update_request = recommendations_pb2.RecommendationsUpdateCityRequest(
             city_id=str(city_id),
             lat=lat,
             lon=lon,

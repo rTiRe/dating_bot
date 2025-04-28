@@ -12,8 +12,10 @@ from src.states import ProfileCreationStates
 async def city(
     message: types.Message,
     state: FSMContext,
-    album: list[types.Message] = [],
+    album: list[types.Message] = None,
 ) -> types.Message:
+    if not album:
+        album = []
     if len(album) > 3:
         return await message.answer('К сожалению я не могу сохранить все твои фото, отправь только 3 самых лучших')
     if not album:

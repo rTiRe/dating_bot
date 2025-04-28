@@ -4,7 +4,7 @@ async def search_profiles(
     point: dict[str, float],
     age: int,
     gender: int,
-    distance: int = 25,
+    distance: float = 25,
     prefer: str = 'city',
     limit: int = 10,
 ) -> tuple[list[str], int]:

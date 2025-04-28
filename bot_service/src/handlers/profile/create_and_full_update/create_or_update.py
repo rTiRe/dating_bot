@@ -19,11 +19,6 @@ async def create(
         description = message.text
     await state.update_data(description=description)
     data = await state.get_data()
-    user_location = data.get('user_location')
-    if user_location:
-        coordinates = user_location
-    else:
-        coordinates = data.get('city_location')
     method_data = {
         'account_id': data.get('account_id'),
         'name': data.get('name'),
@@ -31,9 +26,13 @@ async def create(
         'gender': data.get('gender'),
         'biography': data.get('description'),
         'image_base64_list': list(data.get('photos').values()),
-        'coordinates': coordinates,
         'interested_in': data.get('interested_in')
     }
+    user_location = data.get('user_location')
+    if user_location:
+        method_data['user_point'] = user_location
+    else:
+        method_data['city_point'] = data.get('city_location')
     if data.get('profile_id') is None:
         await profiles_connection.create(**method_data)
     else:

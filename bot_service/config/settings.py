@@ -9,8 +9,10 @@ class Settings(BaseSettings):
 
     BOT_TOKEN: SecretStr
     RABBITMQ_URL: str
+    REDIS_URL: str
     ACCOUNTS_GRPC_URL: str
     PROFILES_GRPC_URL: str
+    RECOMMENDATIONS_GRPC_URL: str
 
     LOGS_FILE: str = 'logs.log'
 

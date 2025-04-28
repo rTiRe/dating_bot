@@ -2,10 +2,12 @@
 
 import asyncio
 
+from redis.asyncio import Redis
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.types import BotCommand, BotCommandScopeAllPrivateChats
+from aiogram.fsm.storage.redis import RedisStorage
 
 from config import logger, settings
 from src.bot import setup_bot, setup_dispatcher
@@ -27,7 +29,7 @@ async def setup_app() -> tuple[Dispatcher, Bot]:
     Returns:
         tuple[Dispatcher, Bot]: bot data.
     """
-    dispatcher = Dispatcher(storage=None)
+    dispatcher = Dispatcher(storage=RedisStorage(redis=Redis.from_url(settings.REDIS_URL)))
     setup_dispatcher(dispatcher)
     dispatcher.include_router(router)
     default_properties = DefaultBotProperties(

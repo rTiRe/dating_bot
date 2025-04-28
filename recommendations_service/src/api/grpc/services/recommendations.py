@@ -61,9 +61,12 @@ class RecommendationsService(recommendations_pb2_grpc.RecommendationsServiceServ
             )
         except Exception as exception:
             await context.abort(grpc.StatusCode.INTERNAL, str(exception))
+        print(cities, flush=True)
         if cities:
             city_id = cities[0][0]
             city_point_dict = cities[0][1]
+        if user_point_dict and not cities:
+            city_id = ''
         document = {
             'city_point': city_point_dict,
             'user_point': user_point_dict,
@@ -86,7 +89,7 @@ class RecommendationsService(recommendations_pb2_grpc.RecommendationsServiceServ
             gender=request.gender,
             result=profile_response['result'],
         )
-        if city_id:
+        if city_id is not None:
             response_message.city_id = city_id
         if city_point_dict:
             response_message.city_point.CopyFrom(profiles_pb2.CityPoint(name='', **city_point_dict))
