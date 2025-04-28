@@ -1,16 +1,12 @@
 from uuid import UUID
 
-from typing_extensions import Annotated
 
-from bot_service.src.api.grpc.connections.base import BaseConnection
+from src.api.grpc.connections.base import BaseConnection
 from config import logger, settings
 from src.api.grpc.protobufs.profiles import profiles_pb2
 from src.api.grpc.protobufs.profiles.profiles_pb2 import UserPoint
 from src.api.grpc.protobufs.recommendations import recommendations_pb2_grpc, recommendations_pb2
-from src.repositories.cities import CitiesRepository
 from src.schemas.profile import CityPoint
-from src.specifications.equals import EqualsSpecification
-from src.storage import database
 
 logger = logger(__name__)
 
@@ -35,7 +31,7 @@ class RecommendationsConnection(BaseConnection):
         if profile_id and not isinstance(profile_id, UUID):
             profile_id = str(UUID(profile_id))  # noqa: WPS125
         update_request = recommendations_pb2.RecommendationsUpdateProfileResponse(
-            profile_id=profile_id,
+            profile_id=str(profile_id),
             age=age,
             gender=gender,
             city_point=city_point,
@@ -52,7 +48,7 @@ class RecommendationsConnection(BaseConnection):
         if city_id and not isinstance(city_id, UUID):
             city_id = str(UUID(city_id))  # noqa: WPS125
         update_request = recommendations_pb2.RecommendationsUpdateCityResponse(
-            city_id=city_id,
+            city_id=str(city_id),
             lat=lat,
             lon=lon,
         )

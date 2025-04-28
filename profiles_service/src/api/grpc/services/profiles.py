@@ -7,7 +7,7 @@ from asyncpg import UniqueViolationError
 from config import logger
 from src.api.grpc.connections.recommendations import recommendations_connection
 from src.api.grpc.protobufs.profiles import profiles_pb2, profiles_pb2_grpc
-from src.api.grpc.protobufs.profiles.profiles_pb2 import UserPoint, CityPoint
+from src.api.grpc.protobufs.profiles.profiles_pb2 import UserPoint, CityPoint, Gender
 from src.repositories.cities import CitiesRepository
 from src.repositories.profiles import ProfilesRepository
 from src.schemas.city import CreateCitySchema
@@ -137,10 +137,22 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
                 except UniqueViolationError:
                     await context.abort(grpc.StatusCode.ALREADY_EXISTS)
                 create_profile_schema.city_id = city.id
+                try:
+                    await recommendations_connection.update_city(city_id=city.id, lat=city.lat, lon=city.lon)
+                except Exception as e:
+                    print(str(e), flush=True)
+                    await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(e))
             try:
                 profile = await ProfilesRepository.create(connection, create_profile_schema)
             except UniqueViolationError:
                 await context.abort(grpc.StatusCode.ALREADY_EXISTS)
+            await recommendations_connection.update_profile(
+                profile_id=profile.id,
+                age=profile.age,
+                gender=profile.gender.name,
+                city_point=CityPoint(name=profile.city_name, lat=city.lat, lon=city.lon),
+                user_point=UserPoint(lat=profile.lat, lon=profile.lon),
+            )
             try:
                 await ProfilesRepository.upload_images(
                     connection,
@@ -289,10 +301,10 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
                 await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
         lat_spec = EqualsSpecification('lat', request.data.city_point.lat)
         lon_spec = EqualsSpecification('lon', request.data.city_point.lon)
-        profile_spec = EqualsSpecification('account_id', request.data.account_id)
+        profile_spec = EqualsSpecification('id', request.id)
         async with database.pool.acquire() as connection:
             cities = await CitiesRepository.get(connection, lat_spec, lon_spec)
-            profile = await ProfilesRepository.get(connection, profile_spec)[0]
+            profile = (await ProfilesRepository.get(connection, profile_spec))[0]
         if len(cities) == 0:
             create_city_schema = CreateCitySchema(lat=request.data.city_point.lat, lon=request.data.city_point.lon)
             city = await CitiesRepository.create(connection, create_city_schema)
