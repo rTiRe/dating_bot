@@ -1,24 +1,42 @@
 name: Checking
 on: [push]
+
 jobs:
   linter_accounts_service:
     name: Accounts service linter
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Python installing
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.12.3
-    - name: Installing dependecies
-      run: |
-        python -m pip install --upgrade pip
-        pip install --upgrade poetry==2.1.2
-        cd accounts_service
-        poetry install --only linters
-    - name: Flake8
-      run: |
-        cd accounts_service
-        poetry run flake8 .
+      - uses: actions/checkout@v2
+      - name: Python installing
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.12.3
+      - name: Installing dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install --upgrade poetry==2.1.2
+          cd accounts_service
+          poetry install --only linters
+      - name: Flake8
+        run: |
+          cd accounts_service
+          poetry run flake8 .
 
-
+  deploy:
+    name: Deploy to Remote Server
+    needs: linter_accounts_service       # ждём успеха линтера
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2       # нужен код для деплоя (git pull)
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1    # SSH-Action для GitHub Actions :contentReference[oaicite:0]{index=0}
+        with:
+          # host: ${{ secrets.SSH_HOST }}       # IP или домен сервера
+          host:
+          username: ${{ secrets.SSH_USER }}   # SSH-юзер
+          key: ${{ secrets.SSH_PRIVATE_KEY }} # приватный ключ
+          port: 22
+          script: |
+            cd /path/to/your/project         # путь на сервере
+            git pull origin main             # подтягиваем свежий код
+            docker compose up -d --build     # деплой через Docker Compose
