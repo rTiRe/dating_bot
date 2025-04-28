@@ -152,6 +152,8 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
                 gender=profile.gender.name,
                 city_point=CityPoint(name=profile.city_name, lat=city.lat, lon=city.lon),
                 user_point=UserPoint(lat=profile.lat, lon=profile.lon),
+                description_len=len(profile.biography),
+                photo_count=len(profile.image_names),
             )
             try:
                 await ProfilesRepository.upload_images(
@@ -309,12 +311,16 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             create_city_schema = CreateCitySchema(lat=request.data.city_point.lat, lon=request.data.city_point.lon)
             city = await CitiesRepository.create(connection, create_city_schema)
             await recommendations_connection.update_city(city_id=city.id, lat=city.lat, lon=city.lon)
+        photo_count = len(request.data.biography) if update_data.get('biography') else len(profile.image_names)
+        description_len = len(request.data.image_base64_list) if update_data.get('image_base64_list') else len(profile.biography)
         profile_response = await recommendations_connection.update_profile(
             profile_id=profile.id,
             age=request.data.age,
             gender=request.data.gender,
             city_point=request.data.city_point,
             user_point=request.data.user_point,
+            description_len=description_len,
+            photo_count=photo_count,
         )
         if profile_response.HasField('city_id'):
             update_data['city_id'] = profile_response.city_id

@@ -27,15 +27,19 @@ class RecommendationsConnection(BaseConnection):
         gender: profiles_pb2.Gender | None = None,
         city_point: CityPoint | None = None,
         user_point: UserPoint | None = None,
+        description_len: int | None = None,
+        photo_count: int | None = None,
     ) -> recommendations_pb2.RecommendationsUpdateProfileResponse:
         if profile_id and not isinstance(profile_id, UUID):
             profile_id = str(UUID(profile_id))  # noqa: WPS125
-        update_request = recommendations_pb2.RecommendationsUpdateProfileResponse(
+        update_request = recommendations_pb2.RecommendationsUpdateProfileRequest(
             profile_id=str(profile_id),
             age=age,
             gender=gender,
             city_point=city_point,
-            user_point=user_point
+            user_point=user_point,
+            description_len=description_len,
+            photo_count=photo_count
         )
         return self.stub.UpdateProfile(update_request)
 
