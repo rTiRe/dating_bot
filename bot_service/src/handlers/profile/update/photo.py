@@ -3,6 +3,7 @@ from base64 import b64encode
 from aiogram import F, types
 from aiogram.fsm.context import FSMContext
 from aiogram.types import ReplyKeyboardRemove
+from aiogram.utils.i18n import lazy_gettext as _
 
 from src.handlers.profile.update.router import router
 from src.templates import render
@@ -16,6 +17,7 @@ async def photo_send(message: types.Message, state: FSMContext) -> types.Message
         await render(
             'profile/create/4_photo',
             first_meet=(await state.get_data()).get('profile_id') is None,
+            language_code=message.from_user.language_code,
         ),
         reply_markup=ReplyKeyboardRemove(),
     )
@@ -30,7 +32,7 @@ async def photo_handlerW(
     album: list[types.Message] = [],
 ) -> types.Message:
     if len(album) > 3:
-        return await message.answer('К сожалению я не могу сохранить все твои фото, отправь только 3 самых лучших')
+        return await message.answer(str(_('К сожалению я не могу сохранить все твои фото, отправь только 3 самых лучших')))
     if not album:
         album.append(message)
     photos = []
@@ -49,5 +51,5 @@ async def photo_handlerW(
 @router.message(ProfileUpdateStates.photo)
 async def photo_handler_error(message: types.Message) -> types.Message:
     return await message.answer(
-        'Я тебя не понял. Пожалуйста, используй встроенные кнопки для ответа',
+        str(_('Я тебя не понял. Пожалуйста, используй встроенные кнопки для ответа')),
     )

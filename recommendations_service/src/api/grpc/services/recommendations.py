@@ -25,6 +25,7 @@ class RecommendationsService(recommendations_pb2_grpc.RecommendationsServiceServ
                 point={'lat': request.lat, 'lon': request.lon},
                 age=request.age,
                 gender=request.gender,
+                searcher_id=request.searcher_id,
                 distance=request.distance,
                 prefer=request.prefer,
                 limit=request.limit,

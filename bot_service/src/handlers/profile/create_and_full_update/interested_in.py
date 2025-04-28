@@ -1,6 +1,7 @@
 from aiogram import F, types
 from aiogram.fsm.context import FSMContext
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.utils.i18n import lazy_gettext as _
 from geopy import Nominatim
 
 from src.handlers.profile.create_and_full_update.router import router
@@ -16,7 +17,7 @@ async def interested_in(message: types.Message, state: FSMContext) -> types.Mess
     if message.text:
         geocoded_city = geolocator.geocode({'city': message.text}, exactly_one=True)
         if not geocoded_city:
-            return await message.answer('Похоже, такого города не существует. Пожалуйста, проверь наличие ошибок')
+            return await message.answer(str(_('Похоже, такого города не существует. Пожалуйста, проверь наличие ошибок')))
         city_location = {
             'name': message.text.capitalize(),
             'lat': geocoded_city.latitude,
@@ -29,19 +30,19 @@ async def interested_in(message: types.Message, state: FSMContext) -> types.Mess
         }
     await state.update_data(city_location=city_location, user_location=user_location)
     bot_message = await message.answer(
-        await render('profile/create/6_interested_in'),
+        await render('profile/create/6_interested_in', language_code=message.from_user.language_code),
         reply_markup=ReplyKeyboardMarkup(
             keyboard=[
                 [
-                    KeyboardButton(text='Парни'),
-                    KeyboardButton(text='Девушки'),
-                    KeyboardButton(text='Все равно'),
+                    KeyboardButton(text=str(_('Парни'))),
+                    KeyboardButton(text=str(_('Девушки'))),
+                    KeyboardButton(text=str(_('Все равно'))),
                 ],
             ],
             is_persistent=True,
             resize_keyboard=True,
             one_time_keyboard=True,
-            input_field_placeholder='Я ищу...',
+            input_field_placeholder=str(_('Я ищу...')),
         ),
     )
     await state.set_state(ProfileCreationStates.interested_in)
@@ -50,4 +51,4 @@ async def interested_in(message: types.Message, state: FSMContext) -> types.Mess
 
 @router.message(ProfileCreationStates.city)
 async def interested_in_error(message: types.Message) -> types.Message:
-    return await message.answer('Мне нужно название города или геопозиция')
+    return await message.answer(str(_('Мне нужно название города или геопозиция')))

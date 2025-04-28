@@ -96,5 +96,16 @@ class ProfilesConnection(BaseConnection):
         )
         return self.stub.Get(profile_request)
 
+    async def get_by_profile_id(
+        self,
+        profile_id: UUID | str,
+    ) -> profiles_pb2.ProfilesGetResponse:
+        if not isinstance(profile_id, UUID):
+            profile_id = UUID(profile_id)  # noqa: WPS125
+        profile_request = profiles_pb2.ProfilesGetRequest(
+            id=str(profile_id),
+        )
+        return self.stub.Get(profile_request)
+
 
 profiles_connection = ProfilesConnection(settings.PROFILES_GRPC_URL)

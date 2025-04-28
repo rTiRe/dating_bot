@@ -1,5 +1,6 @@
 from aiogram import F, types
 from aiogram.fsm.context import FSMContext
+from aiogram.utils.i18n import lazy_gettext as _
 
 from src.handlers.profile.create_and_full_update.router import router
 from src.states import ProfileCreationStates
@@ -11,10 +12,10 @@ async def create(
     message: types.Message,
     state: FSMContext,
 ) -> tuple[types.Message, types.Message, types.Message] | types.Message:
-    if message.text.lower() == 'пропустить':
+    if message.text.lower() in ('пропустить', 'continue'):
         description = ''
     elif len(message.text) < 30:
-        return await message.answer('Напиши хоть несколько слов о себе')
+        return await message.answer(str(_('Напиши хоть несколько слов о себе')))
     else:
         description = message.text
     await state.update_data(description=description)
@@ -42,4 +43,4 @@ async def create(
 
 @router.message(ProfileCreationStates.description)
 async def check_error(message: types.Message) -> types.Message:
-    return await message.answer('Я тебя не понял. Пришли мне текст')
+    return await message.answer(str(_('Я тебя не понял. Пришли мне текст')))

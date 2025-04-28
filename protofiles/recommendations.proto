@@ -19,6 +19,7 @@ message RecommendationsSearchProfilesRequest {
     int32 distance = 5;
     int32 limit = 6;
     string prefer = 7;
+    string searcher_id = 8;
 }
 
 message RecommendationsSearchProfilesResponse {

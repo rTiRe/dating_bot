@@ -13,7 +13,7 @@ async def start_handler(message: types.Message, state: FSMContext) -> None | typ
     if not message.from_user:
         return None
     bot_message = await message.answer(
-        await render('start'),
+        await render('start', language_code=message.from_user.language_code),
     )
     await menu(message, state)
     return bot_message

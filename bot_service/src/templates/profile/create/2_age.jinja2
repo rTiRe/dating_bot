@@ -1,1 +1,5 @@
+{% if language_code == 'ru' %}
 {% if first_meet %}Приятно познакомиться, {{ user_name }}!{% endif %} Сколько тебе лет? 🎂
+{% else %}
+{% if first_meet %}Nice to meet you, {{ user_name }}!{% endif %} How old are you? 🎂
+{% endif %}

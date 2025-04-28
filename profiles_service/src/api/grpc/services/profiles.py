@@ -321,8 +321,8 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
                 create_city_schema = CreateCitySchema(lat=request.data.city_point.lat, lon=request.data.city_point.lon)
                 city = await CitiesRepository.create(connection, create_city_schema)
                 await recommendations_connection.update_city(city_id=city.id, lat=city.lat, lon=city.lon)
-        photo_count = len(request.data.biography) if update_data.get('biography') else len(profile.image_names)
-        description_len = len(request.data.image_base64_list) if update_data.get('image_base64_list') else len(profile.biography)
+        photo_count = len(request.data.biography) if update_data.get('biography') else len(profile.biography)
+        description_len = len(request.data.image_base64_list) if update_data.get('image_base64_list') else len(profile.image_names)
         profile_response = await recommendations_connection.update_profile(
             profile_id=profile.id,
             age=request.data.age,
@@ -338,6 +338,9 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
         if profile_response.HasField('user_point'):
             update_data['lat'] = request.data.user_point.lat
             update_data['lon'] = request.data.user_point.lon
+        else:
+            update_data['lat'] = None
+            update_data['lon'] = None
         specification = EqualsSpecification('id', request.id)
         update_schema = UpdateProfileSchema(**update_data)
         update_result = 'UPDATE 0'

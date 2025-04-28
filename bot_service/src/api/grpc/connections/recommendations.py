@@ -18,16 +18,26 @@ class RecommendationsConnection(BaseConnection):
         self,
         gender: profiles_pb2.Gender | int,
         age: int,
-        city_point: profiles_pb2.CityPoint | None = None,
-        user_point: profiles_pb2.UserPoint | None = None,
+        searcher_id: str,
+        city_point: dict[str, float] | None = None,
+        user_point: dict[str, float] | None = None,
         distance: float = 25,
         limit: int = 10,
     ) -> recommendations_pb2.RecommendationsSearchProfilesResponse:
         profile_request = recommendations_pb2.RecommendationsSearchProfilesRequest(
             age=age,
             gender=gender,
+            distance=distance,
+            limit=limit,
+            searcher_id=searcher_id,
         )
-        return self.stub.Create(profile_request)
+        if user_point:
+            profile_request.lat, profile_request.lon = user_point['lat'], user_point['lon']
+            profile_request.prefer = 'user'
+        else:
+            profile_request.lat, profile_request.lon = city_point['lat'], city_point['lon']
+            profile_request.prefer = 'city'
+        return self.stub.SearchProfiles(profile_request)
 
 
 recommendations_connection = RecommendationsConnection(settings.RECOMMENDATIONS_GRPC_URL)

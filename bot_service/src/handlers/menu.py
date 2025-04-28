@@ -1,10 +1,7 @@
-from base64 import b64decode
-from time import time
-
 from aiogram import F, types
-from aiogram.utils.media_group import MediaGroupBuilder
 from aiogram.fsm.context import FSMContext
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
+from aiogram.utils.i18n import lazy_gettext as _
 from grpc import RpcError, StatusCode
 
 from src.handlers.profile.create_and_full_update.router import router
@@ -12,6 +9,7 @@ from src.templates import render
 from src.states import MainStates
 from src.handlers.profile.create_and_full_update.name import name
 from src.api.grpc.connections import accounts_connection, profiles_connection
+from src.utils import answer_profile
 from config import logger
 
 logger = logger(__name__)
@@ -43,7 +41,7 @@ async def menu(
             profile_id=profile_data.id,
             profile_search_data={
                 'age': profile_data.age,
-                'gender': profile_data.gender,
+                'interested_in': profile_data.interested_in,
                 'city_point': {
                     'lat': profile_data.city_point.lat,
                     'lon': profile_data.city_point.lon,
@@ -55,31 +53,12 @@ async def menu(
             }
         )
     introduce_message = await message.answer(
-        'Так выглядит твоя анкета:',
+        str(_('Так выглядит твоя анкета:')),
         reply_markup=ReplyKeyboardRemove(),
     )
-    caption = await render(
-        'profile/profile',
-        name=profile_data.name,
-        age=profile_data.age,
-        city_location=profile_data.city_point if profile_data.HasField('city_point') else None,
-        user_location=profile_data.user_point if profile_data.HasField('user_point') else None,
-        description=profile_data.biography,
-    )
-    if len(profile_data.image_base64_list) == 1:
-        profile_message = await message.answer_photo(
-            photo=types.BufferedInputFile(b64decode(profile_data.image_base64_list[0]), f'{account_id}_0'),
-            caption=caption,
-        )
-    else:
-        media_group = MediaGroupBuilder(caption=caption)
-        for num, photo_base64 in enumerate(profile_data.image_base64_list):
-            media_group.add_photo(
-                types.BufferedInputFile(b64decode(photo_base64), f'{account_id}_{num}'),
-            )
-        profile_message = await message.answer_media_group(media=media_group.build())
+    profile_message = await answer_profile(message, profile_data)
     menu_message = await message.answer(
-        await render('menu'),
+        await render('menu', language_code=message.from_user.language_code),
         reply_markup=ReplyKeyboardMarkup(
             keyboard=[[
                 KeyboardButton(text='1'),

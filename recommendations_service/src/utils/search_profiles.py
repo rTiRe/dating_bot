@@ -4,6 +4,7 @@ async def search_profiles(
     point: dict[str, float],
     age: int,
     gender: int,
+    searcher_id: str,
     distance: float = 25,
     prefer: str = 'city',
     limit: int = 10,
@@ -19,6 +20,8 @@ async def search_profiles(
     else:
         main_point_field = 'user_point'
         secondary_point_field = 'city_point'
+    must_not_list = [searcher_id]
+    print(prefer, must_not_list, flush=True)
     query = {
         'query': {
             'function_score': {
@@ -39,8 +42,9 @@ async def search_profiles(
                                     secondary_point_field: point,
                                 }},
                             ],
-                            'minimum_should_match': 1,
+                            'minimum_should_match': 0,
                         }}],
+                        'must_not': [{'ids': {'values': must_not_list}}],
                     }
                 },
                 'functions': [

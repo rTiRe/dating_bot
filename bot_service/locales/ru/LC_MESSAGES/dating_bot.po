@@ -1,0 +1,137 @@
+# Russian translations for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-04-28 14:32+0300\n"
+"PO-Revision-Date: 2025-04-28 14:42+0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ru\n"
+"Language-Team: ru <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.8.0\n"
+
+#: src/handlers/menu.py:56
+msgid "Так выглядит твоя анкета:"
+msgstr ""
+
+#: src/handlers/search.py:28
+msgid "Выбор:"
+msgstr ""
+
+#: src/handlers/profile/create_and_full_update/age.py:18
+msgid "Длина имени не может быть больше 64 символов. Попробуй еще раз"
+msgstr ""
+
+#: src/handlers/profile/create_and_full_update/age.py:35
+msgid "Мне нужно знать твое имя"
+msgstr ""
+
+#: src/handlers/profile/create_and_full_update/city.py:21
+#: src/handlers/profile/update/photo.py:34
+msgid ""
+"К сожалению я не могу сохранить все твои фото, отправь только 3 самых "
+"лучших"
+msgstr ""
+
+#: src/handlers/profile/create_and_full_update/city.py:35
+msgid "Отправить координаты"
+msgstr ""
+
+#: src/handlers/profile/create_and_full_update/city.py:40
+msgid "Мой город..."
+msgstr ""
+
+#: src/handlers/profile/create_and_full_update/city.py:49
+msgid "Нет-нет, мне нужно твое фото"
+msgstr ""
+
+#: src/handlers/profile/create_and_full_update/create_or_update.py:18
+#: src/handlers/profile/update/description.py:35
+msgid "Напиши хоть несколько слов о себе"
+msgstr ""
+
+#: src/handlers/profile/create_and_full_update/create_or_update.py:46
+#: src/handlers/profile/update/description.py:47
+msgid "Я тебя не понял. Пришли мне текст"
+msgstr ""
+
+#: src/handlers/profile/create_and_full_update/description.py:28
+#: src/handlers/profile/update/description.py:18
+msgid "Пропустить"
+msgstr ""
+
+#: src/handlers/profile/create_and_full_update/description.py:33
+#: src/handlers/profile/update/description.py:23
+msgid "Я - это ..."
+msgstr ""
+
+#: src/handlers/profile/create_and_full_update/description.py:42
+msgid "Я тебя не понял. Используй кнопки на клавиатуре"
+msgstr ""
+
+#: src/handlers/profile/create_and_full_update/gender.py:16
+msgid "Возраст должен быть числом. Попробуй еще раз"
+msgstr ""
+
+#: src/handlers/profile/create_and_full_update/gender.py:20
+msgid "Возраст должен быть не меньше 7 и не больше 99. Попробуй еще раз"
+msgstr ""
+
+#: src/handlers/profile/create_and_full_update/gender.py:28
+msgid "Я парень"
+msgstr ""
+
+#: src/handlers/profile/create_and_full_update/gender.py:29
+msgid "Я девушка"
+msgstr ""
+
+#: src/handlers/profile/create_and_full_update/gender.py:43
+msgid "Мне нужно знать твой возраст"
+msgstr ""
+
+#: src/handlers/profile/create_and_full_update/interested_in.py:20
+msgid "Похоже, такого города не существует. Пожалуйста, проверь наличие ошибок"
+msgstr ""
+
+#: src/handlers/profile/create_and_full_update/interested_in.py:37
+msgid "Парни"
+msgstr ""
+
+#: src/handlers/profile/create_and_full_update/interested_in.py:38
+msgid "Девушки"
+msgstr ""
+
+#: src/handlers/profile/create_and_full_update/interested_in.py:39
+msgid "Все равно"
+msgstr ""
+
+#: src/handlers/profile/create_and_full_update/interested_in.py:45
+msgid "Я ищу..."
+msgstr ""
+
+#: src/handlers/profile/create_and_full_update/interested_in.py:54
+msgid "Мне нужно название города или геопозиция"
+msgstr ""
+
+#: src/handlers/profile/create_and_full_update/name.py:19
+msgid "Взять из профиля"
+msgstr ""
+
+#: src/handlers/profile/create_and_full_update/name.py:24
+msgid "Меня зовут..."
+msgstr ""
+
+#: src/handlers/profile/create_and_full_update/photo.py:34
+#: src/handlers/profile/update/photo.py:53
+msgid "Я тебя не понял. Пожалуйста, используй встроенные кнопки для ответа"
+msgstr ""
+
