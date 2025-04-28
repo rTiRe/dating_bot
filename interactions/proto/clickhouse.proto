@@ -8,6 +8,8 @@ service ClickHouseService {
   rpc GetUserReceivedLikes(GetUserReceivedLikesRequest) returns (GetUserReceivedLikesResponse);
 
   rpc GetUserReceivedDislikes(GetUserReceivedDislikesRequest) returns (GetUserReceivedDislikesResponse);
+
+  rpc GetUserMutualLikes(GetUserMutualLikesRequest) returns (GetUserMutualLikesResponse);
 }
 
 message GetUserInteractionsRequest {
@@ -51,4 +53,33 @@ message Dislike {
   string timestamp = 1;
   string disliker_id = 2;
   string disliked_id = 3;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// запрос — передаём user_id
+message GetUserMutualLikesRequest {
+  string user_id = 1;
+}
+
+// за каждый совпавший лайк возвращаем пару и время
+message MutualLike {
+  string timestamp = 1;
+  string user1     = 2;
+  string user2     = 3;
+}
+
+message GetUserMutualLikesResponse {
+  repeated MutualLike mutual_likes = 1;
 }

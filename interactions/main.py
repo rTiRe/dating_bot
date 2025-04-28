@@ -15,6 +15,7 @@ class ClickHouseServicer(clickhouse_pb2_grpc.ClickHouseServiceServicer):
     async def setup(self):
         self.client = await clickhouse_connect.get_async_client(
             host="clickhouse_instance",
+            # host="localhost",
             port=8123,
             username="default",
             password="default"
@@ -77,6 +78,27 @@ class ClickHouseServicer(clickhouse_pb2_grpc.ClickHouseServiceServicer):
             dislikes.append(dislike)
 
         return clickhouse_pb2.GetUserReceivedDislikesResponse(dislikes=dislikes) # type: ignore
+
+    async def GetUserMutualLikes(self, request, context):
+        # 1. Выбираем из лог-таблицы взаимных лайков те, где участвует user_id
+        q = f"""
+        SELECT event_time, liker1, liker2
+        FROM dating.mutual_likes_log
+        WHERE (liker1 = '{request.user_id}' OR liker2 = '{request.user_id}')
+          AND sent = 1
+        """
+        result = await self.client.query(q)
+
+        mutual = []
+        for ts, u1, u2 in result.result_set:
+            mutual.append(
+                clickhouse_pb2.MutualLike(
+                    timestamp=ts.isoformat(),
+                    user1=u1,
+                    user2=u2,
+                )
+            )
+        return clickhouse_pb2.GetUserMutualLikesResponse(mutual_likes=mutual)
 
 async def serve():
     server = grpc.aio.server(futures.ThreadPoolExecutor(max_workers=10)) # type: ignore
