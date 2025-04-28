@@ -4,6 +4,7 @@ from typing import AsyncGenerator
 
 import uvicorn
 from fastapi import FastAPI
+from prometheus_client import start_http_server, Counter, Histogram
 
 from config import logger
 from src.storage import database
@@ -15,6 +16,7 @@ logger = logger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    start_http_server(8008)
     await database.connect()
     grpc_task = asyncio.create_task(ProfilesService.serve())
     yield
@@ -34,5 +36,5 @@ if __name__ == '__main__':
         port=8002,
         workers=1,
         access_log=False,
-        reload=True,
+        # reload=True,
     )

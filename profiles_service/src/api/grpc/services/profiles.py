@@ -1,13 +1,16 @@
 import base64
+import time
+from functools import wraps
 from uuid import UUID
 
 import grpc
 from asyncpg import UniqueViolationError
 
 from config import logger
+from src.api.grpc.services import GRPC_REQUEST_COUNT, GRPC_REQUEST_LATENCY
 from src.api.grpc.connections.recommendations import recommendations_connection
 from src.api.grpc.protobufs.profiles import profiles_pb2, profiles_pb2_grpc
-from src.api.grpc.protobufs.profiles.profiles_pb2 import UserPoint, CityPoint, Gender
+from src.api.grpc.protobufs.profiles.profiles_pb2 import UserPoint, CityPoint
 from src.repositories.cities import CitiesRepository
 from src.repositories.profiles import ProfilesRepository
 from src.schemas.city import CreateCitySchema
@@ -17,6 +20,18 @@ from src.storage.minio import minio_instance
 from src.storage.postgres import database
 
 logger = logger(__name__)
+
+def grpc_latency(method_name: str):
+    def deco(func):
+        @wraps(func)
+        async def wrapper(self, request, context):
+            start = time.time()
+            try:
+                return await func(self, request, context)
+            finally:
+                GRPC_REQUEST_LATENCY.labels(method=method_name).observe(time.time() - start)
+        return wrapper
+    return deco
 
 class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
     @staticmethod
@@ -106,17 +121,21 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
         'user_point': __check_user_point,
     }
 
-
+    @grpc_latency('Create')
     async def Create(
         self,
         request: profiles_pb2.ProfileCreateRequest,
         context: grpc.aio.ServicerContext,
     ) -> profiles_pb2.ProfileCreateResponse:
+        method_name = 'Create'
         try:
             for descriptor, field_value in request.ListFields():
                 await self.name_to_checker[descriptor.name](field_value)
         except ValueError as exception:
-            await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
+            logger.exception(exception)
+            status = grpc.StatusCode.INVALID_ARGUMENT
+            GRPC_REQUEST_COUNT.labels(method=method_name, status_code=status.name).inc()
+            await context.abort(status, str(exception))
         create_profile_schema = CreateProfileSchema(
             account_id=UUID(request.account_id),
             name=request.name,
@@ -134,18 +153,26 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
                 create_city_schema = CreateCitySchema(lat=request.city_point.lat, lon=request.city_point.lon)
                 try:
                     city = await CitiesRepository.create(connection, create_city_schema)
-                except UniqueViolationError:
-                    await context.abort(grpc.StatusCode.ALREADY_EXISTS)
+                except UniqueViolationError as exception:
+                    logger.exception(exception)
+                    status = grpc.StatusCode.ALREADY_EXISTS
+                    GRPC_REQUEST_COUNT.labels(method=method_name, status_code=status.name).inc()
+                    await context.abort(status)
                 create_profile_schema.city_id = city.id
                 try:
                     await recommendations_connection.update_city(city_id=city.id, lat=city.lat, lon=city.lon)
-                except Exception as e:
-                    print(str(e), flush=True)
-                    await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(e))
+                except Exception as exception:
+                    logger.exception(exception)
+                    status = grpc.StatusCode.INVALID_ARGUMENT
+                    GRPC_REQUEST_COUNT.labels(method=method_name, status_code=status.name).inc()
+                    await context.abort(status, str(exception))
             try:
                 profile = await ProfilesRepository.create(connection, create_profile_schema)
-            except UniqueViolationError:
-                await context.abort(grpc.StatusCode.ALREADY_EXISTS)
+            except UniqueViolationError as exception:
+                logger.exception(exception)
+                status = grpc.StatusCode.ALREADY_EXISTS
+                GRPC_REQUEST_COUNT.labels(method=method_name, status_code=status.name).inc()
+                await context.abort(status)
             await recommendations_connection.update_profile(
                 profile_id=profile.id,
                 age=profile.age,
@@ -164,7 +191,10 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
                 )
             except Exception as exception:
                 logger.exception(exception)
-                await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
+                status = grpc.StatusCode.INVALID_ARGUMENT
+                GRPC_REQUEST_COUNT.labels(method=method_name, status_code=status.name).inc()
+                await context.abort(status, str(exception))
+        GRPC_REQUEST_COUNT.labels(method=method_name, status_code='OK').inc()
         return profiles_pb2.ProfileCreateResponse(
             id=str(profile.id),
             account_id=str(profile.account_id),
@@ -180,36 +210,53 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             city_point=CityPoint(lat=city.lat, lon=city.lon, name=profile.city_name),
         )
 
-
+    @grpc_latency('Get')
     async def Get(
         self,
         request: profiles_pb2.ProfilesGetRequest,
         context: grpc.aio.ServicerContext
     ) -> profiles_pb2.ProfilesGetResponse:
+        method_name = 'Get'
         profile_identifier = request.WhichOneof('identifier')
         if not profile_identifier:
+            msg = 'The id or telegram_id field must be present'
+            logger.exception(msg)
+            status = grpc.StatusCode.INVALID_ARGUMENT
+            GRPC_REQUEST_COUNT.labels(method=method_name, status_code=status.name).inc()
             await context.abort(
-                grpc.StatusCode.INVALID_ARGUMENT,
-                'The id or telegram_id field must be present',
+                status,
+                msg,
             )
         try:
             await self.name_to_checker[profile_identifier](getattr(request, profile_identifier))
         except ValueError as exception:
-            await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
+            logger.exception(exception)
+            status = grpc.StatusCode.INVALID_ARGUMENT
+            GRPC_REQUEST_COUNT.labels(method=method_name, status_code=status.name).inc()
+            await context.abort(status, str(exception))
         specification = EqualsSpecification(profile_identifier, getattr(request, profile_identifier))
         async with database.pool.acquire() as connection:
             profiles = (await ProfilesRepository.get(connection, specification))
             if len(profiles) == 0:
-                await context.abort(grpc.StatusCode.NOT_FOUND, f'Profile {getattr(request, profile_identifier)} was not found')
+                msg = f'Profile {getattr(request, profile_identifier)} was not found'
+                logger.exception(msg)
+                status = grpc.StatusCode.NOT_FOUND
+                GRPC_REQUEST_COUNT.labels(method=method_name, status_code=status.name).inc()
+                await context.abort(status, msg)
             profile = profiles[0]
             city_specification = EqualsSpecification('id', str(profile.city_id))
             cities = (await CitiesRepository.get(connection, city_specification))
             if len(cities) == 0:
-                await context.abort(grpc.StatusCode.NOT_FOUND, f'City {profile.id} was not found')
+                msg = f'City {profile.id} was not found'
+                logger.exception(msg)
+                status = grpc.StatusCode.NOT_FOUND
+                GRPC_REQUEST_COUNT.labels(method=method_name, status_code=status.name).inc()
+                await context.abort(status, msg)
             city = cities[0]
         if not profile.image_names:
             profile.image_names.append(f'{minio_instance.default_name}{minio_instance.file_format}')
         image_base64_list = [await ProfilesRepository.download_image(minio_instance, image_name) for image_name in profile.image_names]
+        GRPC_REQUEST_COUNT.labels(method=method_name, status_code='OK').inc()
         return profiles_pb2.ProfilesGetResponse(
             id=str(profile.id),
             account_id=str(profile.account_id),
@@ -227,29 +274,42 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             user_point=UserPoint(lat=profile.lat, lon=profile.lon),
         )
 
+    @grpc_latency('GetList')
     async def GetList(
         self,
         request: profiles_pb2.ProfilesGetListRequest,
         context: grpc.aio.ServicerContext,
     ) -> profiles_pb2.ProfilesGetListResponse:
+        method_name = 'GetList'
         profiles_identifiers = list(request.profiles_ids)
         for identifier in profiles_identifiers:
             try:
                 await self.name_to_checker['id'](identifier)
             except ValueError as exception:
-                await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
+                logger.exception(exception)
+                status = grpc.StatusCode.INVALID_ARGUMENT
+                GRPC_REQUEST_COUNT.labels(method=method_name, status_code=status.name).inc()
+                await context.abort(status, str(exception))
         profiles_response: list[profiles_pb2.ProfilesGetResponse] = []
         async with database.pool.acquire() as connection:
             for identifier in profiles_identifiers:
                 profile_specification = EqualsSpecification('id', identifier)
                 profiles = (await ProfilesRepository.get(connection, profile_specification))
                 if len(profiles) == 0:
-                    await context.abort(grpc.StatusCode.NOT_FOUND, f'Profile {identifier} was not found')
+                    msg = f'Profile {identifier} was not found'
+                    logger.exception(msg)
+                    status = grpc.StatusCode.NOT_FOUND
+                    GRPC_REQUEST_COUNT.labels(method=method_name, status_code=status.name).inc()
+                    await context.abort(status, msg)
                 profile = profiles[0]
                 city_specification = EqualsSpecification('id', str(profile.city_id))
                 cities = (await CitiesRepository.get(connection, city_specification))
                 if len(cities) == 0:
-                    await context.abort(grpc.StatusCode.NOT_FOUND, f'City {profile.city_id} was not found')
+                    msg = f'City {profile.city_id} was not found'
+                    logger.exception(msg)
+                    status = grpc.StatusCode.NOT_FOUND
+                    GRPC_REQUEST_COUNT.labels(method=method_name, status_code=status.name).inc()
+                    await context.abort(status, msg)
                 city = cities[0]
                 if not profile.image_names:
                     profile.image_names.append(f'{minio_instance.default_name}{minio_instance.file_format}')
@@ -282,25 +342,34 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
                         ),
                     )
                 )
+        GRPC_REQUEST_COUNT.labels(method=method_name, status_code='OK').inc()
         return profiles_pb2.ProfilesGetListResponse(
             messages=profiles_response,
         )
 
-
+    @grpc_latency('Update')
     async def Update(
         self,
         request: profiles_pb2.ProfileUpdateRequest,
         context: grpc.aio.ServicerContext,
     ) -> profiles_pb2.ProfilesUpdateResponse:
+        method_name = 'Update'
         update_data = {descriptor.name: field_value for descriptor, field_value in request.data.ListFields()}
         if not update_data:
-            await context.abort(grpc.StatusCode.INVALID_ARGUMENT, 'Empty update data')
+            msg = 'Empty update data'
+            logger.exception(msg)
+            status = grpc.StatusCode.INVALID_ARGUMENT
+            GRPC_REQUEST_COUNT.labels(method=method_name, status_code=status.name).inc()
+            await context.abort(status, msg)
         for name, field_value in update_data.items():
             try:  # noqa: WPS229
                 await self.__check_id(request.id)
                 await self.name_to_checker[name](field_value)
             except ValueError as exception:
-                await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
+                logger.exception(exception)
+                status = grpc.StatusCode.INVALID_ARGUMENT
+                GRPC_REQUEST_COUNT.labels(method=method_name, status_code=status.name).inc()
+                await context.abort(status, str(exception))
         lat_spec = EqualsSpecification('lat', request.data.city_point.lat)
         lon_spec = EqualsSpecification('lon', request.data.city_point.lon)
         profile_spec = EqualsSpecification('id', request.id)
@@ -340,8 +409,10 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
                     )
                 except UniqueViolationError as exception:
                     logger.error(exception)
+                    status = grpc.StatusCode.ALREADY_EXISTS
+                    GRPC_REQUEST_COUNT.labels(method=method_name, status_code=status.name).inc()
                     await context.abort(
-                        grpc.StatusCode.ALREADY_EXISTS,
+                        status,
                         'An account with this telegram_id field already exists',
                     )
             if update_data.get('image_base64_list'):
@@ -355,20 +426,29 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
                     )
                 except Exception as exception:
                     logger.exception(exception)
-                    await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
+                    status = grpc.StatusCode.INVALID_ARGUMENT
+                    GRPC_REQUEST_COUNT.labels(method=method_name, status_code=status.name).inc()
+                    await context.abort(status, str(exception))
+        GRPC_REQUEST_COUNT.labels(method=method_name, status_code='OK').inc()
         return profiles_pb2.ProfilesUpdateResponse(result=update_result)
 
+    @grpc_latency('Delete')
     async def Delete(
         self,
         request: profiles_pb2.ProfileDeleteRequest,
         context: grpc.aio.ServicerContext,
     ) -> profiles_pb2.ProfilesDeleteResponse:
+        method_name = 'Delete'
         try:
             await self.__check_id(request.id)
         except ValueError as exception:
-            await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
+            logger.exception(exception)
+            status = grpc.StatusCode.INVALID_ARGUMENT
+            GRPC_REQUEST_COUNT.labels(method=method_name, status_code=status.name).inc()
+            await context.abort(status, str(exception))
         delete_specification = EqualsSpecification('id', request.id)
         async with database.pool.acquire() as connection:
             delete_result = await ProfilesRepository.delete(connection, delete_specification)
         await ProfilesRepository.delete_images(minio_instance, request.id)
+        GRPC_REQUEST_COUNT.labels(method=method_name, status_code='OK').inc()
         return profiles_pb2.ProfilesDeleteResponse(result=delete_result)
