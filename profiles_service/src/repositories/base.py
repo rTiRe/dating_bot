@@ -40,7 +40,7 @@ class BaseRepository(ABC):
             returning *
         """
         statement = await Specification.to_asyncpg_query(f'{statement};')
-        model_data: Record = await connection.fetchrow(statement, *statement_values)
+        model_data: Record = await connection.fetchrow(statement, *statement_values) # type: ignore
         return schema(**model_data)
 
     @staticmethod

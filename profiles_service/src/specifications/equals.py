@@ -26,6 +26,6 @@ class InSpecification(Specification):
         if not self.compare_values:
             return '1=0', []
         if len(self.compare_values) == 1:
-            return f'{self.column} = ??', self.compare_values
+            return f'{self.column} = ??', self.compare_values # type: ignore
         placeholders = ', '.join('??' * len(self.compare_values))
         return f'{self.attribute} IN ({placeholders})', self.compare_values

@@ -29,7 +29,7 @@ class DBConnection:
         )
 
     async def connect(self) -> None:
-        self.elasticsearch = AsyncElasticsearch(**self._credentials)
+        self.elasticsearch = AsyncElasticsearch(**self._credentials) # type: ignore
         await self.__ensure_index_exists()
 
 

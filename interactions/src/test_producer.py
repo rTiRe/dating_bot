@@ -1,7 +1,7 @@
 import asyncio
 import json
-from aio_pika import connect_robust, Message, Queue, DeliveryMode, ExchangeType
-from aio_pika.abc import AbstractChannel, AbstractConnection, AbstractQueue
+from aio_pika import connect_robust, Message, Queue, DeliveryMode, ExchangeType # type: ignore
+from aio_pika.abc import AbstractChannel, AbstractConnection, AbstractQueue # type: ignore
 from config import *
 
 async def send_message(connection: AbstractConnection, interaction_type: InteractionType, data: dict):
@@ -17,14 +17,16 @@ async def send_message(connection: AbstractConnection, interaction_type: Interac
     queue: AbstractQueue = await channel.declare_queue(QUEUE_NAME, durable=True)
 
     await queue.bind(exchange, routing_key='')
-
-    data[INTERACTION_TYPE_FIELD] = interaction_type.value
-    message = Message(
-        body=json.dumps(data).encode(),
-        delivery_mode=DeliveryMode.PERSISTENT
-    )
-    await exchange.publish(message, routing_key='')
-    print(f"Sent message: {data}")
+    for i in range(50):
+        data[INTERACTION_TYPE_FIELD] = interaction_type.value
+        data[LIKER_ID_FIELD] = i
+        data[LIKED_ID_FIELD] = 50 - i
+        message = Message(
+            body=json.dumps(data).encode(),
+            delivery_mode=DeliveryMode.PERSISTENT
+        )
+        await exchange.publish(message, routing_key='')
+        print(f"Sent message: {data}")
 
 
 
@@ -37,8 +39,6 @@ async def main():
             password=RABBITMQ_PASSWORD
             )
         await send_message(connection, InteractionType.LIKE, {LIKER_ID_FIELD: 1, LIKED_ID_FIELD: 2})
-        await send_message(connection, InteractionType.LIKE, {LIKER_ID_FIELD: 2, LIKED_ID_FIELD: 1})
-        await send_message(connection, InteractionType.DISLIKE, {LIKER_ID_FIELD: 1, LIKED_ID_FIELD: 2})
     except Exception as e:
         print(f"Error: {e}")
     finally:

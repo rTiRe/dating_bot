@@ -5,7 +5,7 @@ from uuid import UUID
 
 from asyncpg import Record
 from asyncpg.connection import Connection
-from minio.deleteobjects import DeleteObject
+from minio.deleteobjects import DeleteObject # type: ignore
 from pydantic import BaseModel
 
 from src.exceptions import UpdateAllRowsException, ImageDeletionError
@@ -33,7 +33,7 @@ class ProfilesRepository(BaseRepository):
             returning *
         """
         statement = await Specification.to_asyncpg_query(f'{statement};')
-        model_data: Record = await connection.fetchrow(statement, *statement_values)
+        model_data: Record = await connection.fetchrow(statement, *statement_values) # type: ignore
         return ProfileSchema(**model_data)
 
     @staticmethod
@@ -50,7 +50,7 @@ class ProfilesRepository(BaseRepository):
             *specifications,
             page=page,
             page_size=page_size
-        )
+        ) # type: ignore
 
     @staticmethod
     async def update(
@@ -109,7 +109,7 @@ class ProfilesRepository(BaseRepository):
                 raise ValueError(f'Invalid base64 for image {idx}')
             timestamp = int(time.time()*1000)
             filename = f'{profile_id}_{timestamp}_{idx}.jpg'
-            minio.client.put_object(
+            minio.client.put_object( # type: ignore
                 bucket_name=minio.bucket,
                 object_name=filename,
                 data=io.BytesIO(img_data),
@@ -129,7 +129,7 @@ class ProfilesRepository(BaseRepository):
         response = None
         image_base64 = None
         try:
-            response = minio.client.get_object(
+            response = minio.client.get_object( # type: ignore
                 bucket_name=minio.bucket,
                 object_name=image_name
             )
@@ -147,12 +147,12 @@ class ProfilesRepository(BaseRepository):
     ) -> bool:
         images_list = map(
             lambda img: DeleteObject(img.object_name),
-            minio.client.list_objects(
+            minio.client.list_objects( # type: ignore
                 bucket_name=minio.bucket,
                 prefix=profile_id
             )
         )
-        errors = minio.client.remove_objects(bucket_name=minio.bucket, delete_object_list=images_list)
+        errors = minio.client.remove_objects(bucket_name=minio.bucket, delete_object_list=images_list) # type: ignore
         if errors:
             for error in errors:
                 raise ImageDeletionError(f'{error.name}: {error.message}')

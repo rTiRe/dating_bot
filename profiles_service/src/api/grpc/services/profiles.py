@@ -17,7 +17,7 @@ logger = logger(__name__)
 class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
     @staticmethod
     async def serve() -> None:
-        server = grpc.aio.server()
+        server = grpc.aio.server() # type: ignore
         profiles_pb2_grpc.add_ProfilesServiceServicer_to_server(ProfilesService(), server)
         server.add_insecure_port('[::]:1337')
         await server.start()
@@ -28,7 +28,7 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
         if not id:
             raise ValueError('The id field must be set')
         try:
-            UUID(id)
+            UUID(id) # type: ignore
         except ValueError:
             raise ValueError('The id field must be of type UUID')
 
@@ -94,7 +94,7 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
     async def Create(
         self,
         request: profiles_pb2.ProfileCreateRequest,
-        context: grpc.aio.ServicerContext,
+        context: grpc.aio.ServicerContext, # type: ignore
     ) -> profiles_pb2.ProfileCreateResponse:
         try:
             for descriptor, field_value in request.ListFields():
@@ -108,8 +108,8 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             gender=request.gender,
             biography=request.biography,
             language_locale=request.language_locale,
-            lat=request.lat,
-            lon=request.lon,
+            lat=request.lat, # type: ignore
+            lon=request.lon, # type: ignore
             interested_in=request.interested_in
         )
         async with database.pool.acquire() as connection:
@@ -125,20 +125,20 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
                     profile.id,
                 )
             except Exception as exception:
-                logger.exception(exception)
+                logger.exception(exception) # type: ignore
                 await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
         return profiles_pb2.ProfileCreateResponse(
             id=str(profile.id),
             account_id=str(profile.account_id),
             name=profile.name,
             age=profile.age,
-            gender=profile.gender.name,
+            gender=profile.gender.name, # type: ignore
             biography=profile.biography,
             language_locale=request.language_locale,
             created_at=profile.created_at.isoformat(),
             updated_at=profile.updated_at.isoformat(),
-            lat=profile.lat,
-            lon=profile.lon,
+            lat=profile.lat, # type: ignore
+            lon=profile.lon, # type: ignore
             rating=profile.rating,
         )
 
@@ -146,7 +146,7 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
     async def Get(
         self,
         request: profiles_pb2.ProfilesGetRequest,
-        context: grpc.aio.ServicerContext
+        context: grpc.aio.ServicerContext # type: ignore
     ) -> profiles_pb2.ProfilesGetResponse:
         identifier_field = request.WhichOneof('identifier')
         if not identifier_field:
@@ -170,22 +170,22 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
             account_id=str(profile.account_id),
             name=profile.name,
             age=profile.age,
-            gender=profile.gender.name,
+            gender=profile.gender.name, # type: ignore
             biography=profile.biography,
             language_locale=profile.language_locale,
             created_at=profile.created_at.isoformat(),
             updated_at=profile.updated_at.isoformat(),
             image_base64_list=image_base64_list,
-            lat=profile.lat,
-            lon=profile.lon,
+            lat=profile.lat, # type: ignore
+            lon=profile.lon, # type: ignore
             rating=profile.rating,
-            interested_in=profile.interested_in.name,
+            interested_in=profile.interested_in.name, # type: ignore
         )
 
     async def Update(
         self,
         request: profiles_pb2.ProfileUpdateRequest,
-        context: grpc.aio.ServicerContext,
+        context: grpc.aio.ServicerContext, # type: ignore
     ) -> profiles_pb2.ProfilesUpdateResponse:
         update_data = {descriptor.name: field_value for descriptor, field_value in request.data.ListFields()}
         if not update_data:
@@ -207,7 +207,7 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
                         update_data=update_schema,
                     )
                 except UniqueViolationError as exception:
-                    logger.error(exception)
+                    logger.error(exception) # type: ignore
                     await context.abort(
                         grpc.StatusCode.ALREADY_EXISTS,
                         'An account with this telegram_id field already exists',
@@ -222,14 +222,14 @@ class ProfilesService(profiles_pb2_grpc.ProfilesServiceServicer):
                         UUID(request.id),
                     )
                 except Exception as exception:
-                    logger.exception(exception)
+                    logger.exception(exception) # type: ignore
                     await context.abort(grpc.StatusCode.INVALID_ARGUMENT, str(exception))
         return profiles_pb2.ProfilesUpdateResponse(result=update_result)
 
     async def Delete(
         self,
         request: profiles_pb2.ProfileDeleteRequest,
-        context: grpc.aio.ServicerContext,
+        context: grpc.aio.ServicerContext, # type: ignore
     ) -> profiles_pb2.ProfilesDeleteResponse:
         try:
             await self.__check_id(request.id)

@@ -1,6 +1,6 @@
 import asyncio
 import contextlib
-import clickhouse_connect
+import clickhouse_connect # type: ignore
 import grpc
 from concurrent import futures
 import proto.clickhouse_pb2 as clickhouse_pb2
@@ -26,11 +26,11 @@ class ClickHouseServicer(clickhouse_pb2_grpc.ClickHouseServiceServicer):
         FROM dating.interactions
         WHERE liker_id = '{request.user_id}'
         """
-        result = await self.client.query(query)
+        result = await self.client.query(query) # type: ignore
 
         interactions = []
         for row in result.result_set:
-            interaction = clickhouse_pb2.Interaction(
+            interaction = clickhouse_pb2.Interaction( # type: ignore
                 timestamp=row[0].isoformat(),
                 liker_id=str(row[1]),
                 liked_id=str(row[2]),
@@ -38,7 +38,7 @@ class ClickHouseServicer(clickhouse_pb2_grpc.ClickHouseServiceServicer):
             )
             interactions.append(interaction)
 
-        return clickhouse_pb2.GetUserInteractionsResponse(interactions=interactions)
+        return clickhouse_pb2.GetUserInteractionsResponse(interactions=interactions) # type: ignore
 
     async def GetUserReceivedLikes(self, request, context):
         query = f"""
@@ -46,18 +46,18 @@ class ClickHouseServicer(clickhouse_pb2_grpc.ClickHouseServiceServicer):
         FROM dating.interactions
         WHERE liked_id = '{request.user_id}' AND interaction_type = 'like'
         """
-        result = await self.client.query(query)
+        result = await self.client.query(query) # type: ignore
 
         likes = []
         for row in result.result_set:
-            like = clickhouse_pb2.Like(
+            like = clickhouse_pb2.Like( # type: ignore
                 timestamp=row[0].isoformat(),
                 liker_id=str(row[1]),
                 liked_id=str(row[2])
             )
             likes.append(like)
 
-        return clickhouse_pb2.GetUserReceivedLikesResponse(likes=likes)
+        return clickhouse_pb2.GetUserReceivedLikesResponse(likes=likes) # type: ignore
 
     async def GetUserReceivedDislikes(self, request, context):
         query = f"""
@@ -65,21 +65,21 @@ class ClickHouseServicer(clickhouse_pb2_grpc.ClickHouseServiceServicer):
         FROM dating.interactions
         WHERE liked_id = '{request.user_id}' AND interaction_type = 'dislike'
         """
-        result = await self.client.query(query)
+        result = await self.client.query(query) # type: ignore
 
         dislikes = []
         for row in result.result_set:
-            dislike = clickhouse_pb2.Dislike(
+            dislike = clickhouse_pb2.Dislike( # type: ignore
                 timestamp=row[0].isoformat(),
                 disliker_id=str(row[1]),
                 disliked_id=str(row[2])
             )
             dislikes.append(dislike)
 
-        return clickhouse_pb2.GetUserReceivedDislikesResponse(dislikes=dislikes)
+        return clickhouse_pb2.GetUserReceivedDislikesResponse(dislikes=dislikes) # type: ignore
 
 async def serve():
-    server = grpc.aio.server(futures.ThreadPoolExecutor(max_workers=10))
+    server = grpc.aio.server(futures.ThreadPoolExecutor(max_workers=10)) # type: ignore
     servicer = ClickHouseServicer()
     await servicer.setup()
 

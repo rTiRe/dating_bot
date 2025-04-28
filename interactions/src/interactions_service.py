@@ -1,7 +1,7 @@
 import asyncio
 import json
-from aio_pika import connect_robust, Message
-from aio_pika.abc import AbstractChannel, AbstractConnection, AbstractQueue
+from aio_pika import connect_robust, Message # type: ignore
+from aio_pika.abc import AbstractChannel, AbstractConnection, AbstractQueue # type: ignore
 from db import Database
 from config import *
 
@@ -23,9 +23,9 @@ class InteractionsService:
             login=RABBITMQ_USER,
             password=RABBITMQ_PASSWORD
         )
-        self.channel = await self.connection.channel()
+        self.channel = await self.connection.channel() # type: ignore
 
-        self.queue = await self.channel.declare_queue(
+        self.queue = await self.channel.declare_queue( # type: ignore
             QUEUE_NAME,
             durable=True
         )
@@ -46,7 +46,7 @@ class InteractionsService:
                 print(f"Error processing interaction: {e}")
 
     async def start_consuming(self):
-        await self.queue.consume(self.process_interaction)
+        await self.queue.consume(self.process_interaction) # type: ignore
         print('Started consuming messages...')
 
 

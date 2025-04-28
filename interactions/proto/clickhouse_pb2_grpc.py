@@ -36,18 +36,18 @@ class ClickHouseServiceStub(object):
         """
         self.GetUserInteractions = channel.unary_unary(
                 '/clickhouse.ClickHouseService/GetUserInteractions',
-                request_serializer=proto_dot_clickhouse__pb2.GetUserInteractionsRequest.SerializeToString,
-                response_deserializer=proto_dot_clickhouse__pb2.GetUserInteractionsResponse.FromString,
+                request_serializer=proto_dot_clickhouse__pb2.GetUserInteractionsRequest.SerializeToString, # type: ignore
+                response_deserializer=proto_dot_clickhouse__pb2.GetUserInteractionsResponse.FromString, # type: ignore
                 _registered_method=True)
         self.GetUserReceivedLikes = channel.unary_unary(
                 '/clickhouse.ClickHouseService/GetUserReceivedLikes',
-                request_serializer=proto_dot_clickhouse__pb2.GetUserReceivedLikesRequest.SerializeToString,
-                response_deserializer=proto_dot_clickhouse__pb2.GetUserReceivedLikesResponse.FromString,
+                request_serializer=proto_dot_clickhouse__pb2.GetUserReceivedLikesRequest.SerializeToString, # type: ignore
+                response_deserializer=proto_dot_clickhouse__pb2.GetUserReceivedLikesResponse.FromString, # type: ignore
                 _registered_method=True)
         self.GetUserReceivedDislikes = channel.unary_unary(
                 '/clickhouse.ClickHouseService/GetUserReceivedDislikes',
-                request_serializer=proto_dot_clickhouse__pb2.GetUserReceivedDislikesRequest.SerializeToString,
-                response_deserializer=proto_dot_clickhouse__pb2.GetUserReceivedDislikesResponse.FromString,
+                request_serializer=proto_dot_clickhouse__pb2.GetUserReceivedDislikesRequest.SerializeToString, # type: ignore
+                response_deserializer=proto_dot_clickhouse__pb2.GetUserReceivedDislikesResponse.FromString, # type: ignore
                 _registered_method=True)
 
 
@@ -77,18 +77,18 @@ def add_ClickHouseServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'GetUserInteractions': grpc.unary_unary_rpc_method_handler(
                     servicer.GetUserInteractions,
-                    request_deserializer=proto_dot_clickhouse__pb2.GetUserInteractionsRequest.FromString,
-                    response_serializer=proto_dot_clickhouse__pb2.GetUserInteractionsResponse.SerializeToString,
+                    request_deserializer=proto_dot_clickhouse__pb2.GetUserInteractionsRequest.FromString, # type: ignore
+                    response_serializer=proto_dot_clickhouse__pb2.GetUserInteractionsResponse.SerializeToString, # type: ignore
             ),
             'GetUserReceivedLikes': grpc.unary_unary_rpc_method_handler(
                     servicer.GetUserReceivedLikes,
-                    request_deserializer=proto_dot_clickhouse__pb2.GetUserReceivedLikesRequest.FromString,
-                    response_serializer=proto_dot_clickhouse__pb2.GetUserReceivedLikesResponse.SerializeToString,
+                    request_deserializer=proto_dot_clickhouse__pb2.GetUserReceivedLikesRequest.FromString, # type: ignore
+                    response_serializer=proto_dot_clickhouse__pb2.GetUserReceivedLikesResponse.SerializeToString, # type: ignore
             ),
             'GetUserReceivedDislikes': grpc.unary_unary_rpc_method_handler(
                     servicer.GetUserReceivedDislikes,
-                    request_deserializer=proto_dot_clickhouse__pb2.GetUserReceivedDislikesRequest.FromString,
-                    response_serializer=proto_dot_clickhouse__pb2.GetUserReceivedDislikesResponse.SerializeToString,
+                    request_deserializer=proto_dot_clickhouse__pb2.GetUserReceivedDislikesRequest.FromString, # type: ignore
+                    response_serializer=proto_dot_clickhouse__pb2.GetUserReceivedDislikesResponse.SerializeToString, # type: ignore
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -112,12 +112,12 @@ class ClickHouseService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(
+        return grpc.experimental.unary_unary( # type: ignore
             request,
             target,
             '/clickhouse.ClickHouseService/GetUserInteractions',
-            proto_dot_clickhouse__pb2.GetUserInteractionsRequest.SerializeToString,
-            proto_dot_clickhouse__pb2.GetUserInteractionsResponse.FromString,
+            proto_dot_clickhouse__pb2.GetUserInteractionsRequest.SerializeToString, # type: ignore
+            proto_dot_clickhouse__pb2.GetUserInteractionsResponse.FromString, # type: ignore
             options,
             channel_credentials,
             insecure,
@@ -139,12 +139,12 @@ class ClickHouseService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(
+        return grpc.experimental.unary_unary( # type: ignore
             request,
             target,
             '/clickhouse.ClickHouseService/GetUserReceivedLikes',
-            proto_dot_clickhouse__pb2.GetUserReceivedLikesRequest.SerializeToString,
-            proto_dot_clickhouse__pb2.GetUserReceivedLikesResponse.FromString,
+            proto_dot_clickhouse__pb2.GetUserReceivedLikesRequest.SerializeToString, # type: ignore
+            proto_dot_clickhouse__pb2.GetUserReceivedLikesResponse.FromString, # type: ignore
             options,
             channel_credentials,
             insecure,
@@ -166,12 +166,12 @@ class ClickHouseService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(
+        return grpc.experimental.unary_unary( # type: ignore
             request,
             target,
             '/clickhouse.ClickHouseService/GetUserReceivedDislikes',
-            proto_dot_clickhouse__pb2.GetUserReceivedDislikesRequest.SerializeToString,
-            proto_dot_clickhouse__pb2.GetUserReceivedDislikesResponse.FromString,
+            proto_dot_clickhouse__pb2.GetUserReceivedDislikesRequest.SerializeToString, # type: ignore
+            proto_dot_clickhouse__pb2.GetUserReceivedDislikesResponse.FromString, # type: ignore
             options,
             channel_credentials,
             insecure,

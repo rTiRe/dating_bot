@@ -128,7 +128,7 @@ class ProfilesService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(
+        return grpc.experimental.unary_unary( # type: ignore
             request,
             target,
             '/dating.service.profiles.ProfilesService/Create',
@@ -155,7 +155,7 @@ class ProfilesService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(
+        return grpc.experimental.unary_unary( # type: ignore
             request,
             target,
             '/dating.service.profiles.ProfilesService/Get',
@@ -182,7 +182,7 @@ class ProfilesService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(
+        return grpc.experimental.unary_unary( # type: ignore
             request,
             target,
             '/dating.service.profiles.ProfilesService/Update',
@@ -209,7 +209,7 @@ class ProfilesService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(
+        return grpc.experimental.unary_unary( # type: ignore
             request,
             target,
             '/dating.service.profiles.ProfilesService/Delete',

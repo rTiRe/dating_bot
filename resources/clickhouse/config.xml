@@ -3,4 +3,7 @@
         <username>admin</username>
         <password>admin</password>
     </rabbitmq>
+    <format>
+    <date_time_input_format>best_effort</date_time_input_format>
+  </format>
 </yandex>

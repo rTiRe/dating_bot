@@ -8,7 +8,7 @@ from src.storage.elasticsearch import database
 class RecommendationsService(recommendations_pb2_grpc.RecommendationsServiceServicer):
     @staticmethod
     async def serve():
-        server = grpc.aio.server()
+        server = grpc.aio.server() # type: ignore
         recommendations_pb2_grpc.add_ElasticSearchServicer_to_server(RecommendationsService(), server) # type: ignore
         server.add_insecure_port('[::]:1337')
         await server.start()
@@ -17,7 +17,7 @@ class RecommendationsService(recommendations_pb2_grpc.RecommendationsServiceServ
     async def GetMatch(
         self,
         request: recommendations_pb2.RecommendationsGetMatchRequest,
-        context: grpc.aio.ServicerContext,
+        context: grpc.aio.ServicerContext, # type: ignore
     ) -> recommendations_pb2.RecommendationsGetMatchResponse:
         query = {
             'query': {
@@ -39,7 +39,7 @@ class RecommendationsService(recommendations_pb2_grpc.RecommendationsServiceServ
         try:
             response = database.elasticsearch.search(index='users', body=query)
         except Exception as exception:
-            context.abort(grpc.StatusCode.INTERNAL, str(exception)) # type: ignore
+            context.abort(grpc.StatusCode.INTERNAL, str(exception))
         hits = response['hits']['hits']
         user_ids = [hit['_source']['user_id'] for hit in hits]
         total = response['hits']['total']['value']
@@ -51,7 +51,7 @@ class RecommendationsService(recommendations_pb2_grpc.RecommendationsServiceServ
     async def UpdateUser(
         self,
         request: recommendations_pb2.RecommendationsUpdateUserRequest,
-        context: grpc.aio.ServicerContext,
+        context: grpc.aio.ServicerContext, # type: ignore
     ) -> recommendations_pb2.RecommendationsUpdateUserResponse:
         doc = {
             'user_id': request.user_id,
@@ -70,7 +70,7 @@ class RecommendationsService(recommendations_pb2_grpc.RecommendationsServiceServ
                 op_type='index'
             )
         except Exception as exception:
-            context.abort(grpc.StatusCode.INTERNAL, str(exception)) # type: ignore
+            context.abort(grpc.StatusCode.INTERNAL, str(exception))
         created = response['result'] == 'created'
         return recommendations_pb2.RecommendationsUpdateUserResponse(
             user_id=request.user_id,
