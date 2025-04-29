@@ -58,5 +58,5 @@ INNER JOIN interactions AS j
 WHERE
     i.interaction_type = 'like'
   AND j.interaction_type = 'like'
-  AND i.liker_id < i.liked_id
+--   AND i.liker_id < i.liked_id
 ;

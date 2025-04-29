@@ -278,6 +278,12 @@ services:
         condition: service_started
       recommendations_service:
         condition: service_started
+      interactions:
+        condition: service_started
+      celery_worker:
+        condition: service_started
+      celery_beat:
+        condition: service_started
     env_file:
       - bot_service/config/.env
     volumes:

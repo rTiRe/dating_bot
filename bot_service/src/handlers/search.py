@@ -1,10 +1,12 @@
+import asyncio
+
 from aiogram import types, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.utils.i18n import lazy_gettext as _
 
 from src.handlers.router import router
-from src.api.grpc.connections import recommendations_connection, profiles_connection
+from src.api.grpc.connections import recommendations_connection, profiles_connection, accounts_connection, interactions_connection
 from src.handlers.menu import menu
 from src.storage.redis import redis
 from src.utils import answer_profile
@@ -42,6 +44,14 @@ async def search(message: types.Message, state: FSMContext) -> types.Message:
             liker_id=profile_id,
             liked_id=state_data['current_profile_id'],
         )
+        await asyncio.sleep(2)
+        for like in list((await interactions_connection.get_mutal_likes(user_id=state_data['current_profile_id'])).mutual_likes):
+            if not (like.user1 in (profile_id, state_data['current_profile_id']) and like.user2 in (profile_id, state_data['current_profile_id'])):
+                liked_profile_data = await profiles_connection.get_by_profile_id(state_data['current_profile_id'])
+                account_data = await accounts_connection.get_by_id(liked_profile_data.account_id)
+                mutal_message = await message.bot.send_message(chat_id=account_data.telegram_id, text='Вас лайкнули!')
+                await answer_profile(mutal_message, await profiles_connection.get_by_profile_id(profile_id))
+                break
     elif message.text.lower() == '👎':
         await rabbit.publish_dislike(
             liker_id=profile_id,
@@ -59,7 +69,12 @@ async def search(message: types.Message, state: FSMContext) -> types.Message:
         await redis.rpush(profile_id, *list(searched_profiles.profile_ids))
         await redis.expire(profile_id, 600)
         next_profile_id: bytes = await redis.lpop(profile_id)
-    next_profile_id = next_profile_id.decode()
+    if next_profile_id:
+        next_profile_id = next_profile_id.decode()
+    else:
+        profiles_end_message = await message.answer('Анкеты закончились, приходи позже')
+        await menu(message, state)
+        return profiles_end_message
     profile_data = await profiles_connection.get_by_profile_id(next_profile_id)
     profile_message = await answer_profile(message, profile_data)
     await state.set_state(MainStates.search)

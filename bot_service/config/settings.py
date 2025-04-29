@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     REDIS_FSM_URL: str
     ACCOUNTS_GRPC_URL: str
     PROFILES_GRPC_URL: str
+    INTERACTIONS_GRPC_URL: str
     RECOMMENDATIONS_GRPC_URL: str
 
     LOGS_FILE: str = 'logs.log'
